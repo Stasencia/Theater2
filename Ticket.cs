@@ -17,24 +17,11 @@ namespace Project_theater
         {
             DataContext db = new DataContext(DB_connection.connectionString);
 
-            var q = db.GetTable<TTickets>()
-                    .Join(db.GetTable<TAfisha_dates>(),
-                        tp => new { Id = tp.Performance_id, tp.Date },
-                        ap => new { Id = ap.Id_performance, ap.Date },
-                        (tp, ap) => new { Id = tp.Performance_id, tp.Date, ap.Time, tp.Seat, tp.User_Id })
-                    .Join(db.GetTable<TAfisha>(),
-                      tp => tp.Id,
-                      ap => ap.Id,
-                      (tp, ap) => new { ap.Name, tp.Date, tp.Time, tp.Seat, ap.Small_image, tp.User_Id })
-                  .Where(k => k.User_Id == Program.user.ID)
-                  .GroupBy(x => new { x.Name, x.Date, x.Time, x.Small_image })
-                  .Select(x => new { Key = x.Key, Count = x.Select(d => d.Seat).Count(), Seats = x.Select(d => d.Seat) });
-
             IQueryable<Ticket_sell_info> ticket_Sell_Infos = db.GetTable<TTickets>()
                     .Join(db.GetTable<TAfisha_dates>(),
-                        tp => new { Id = tp.Performance_id, tp.Date },
-                        ap => new { Id = ap.Id_performance, ap.Date },
-                        (tp, ap) => new { Id = tp.Performance_id, tp.Date, ap.Time, tp.Seat, tp.User_Id })
+                        tp => tp.Performance_info_id,
+                        ap => ap.Id,
+                        (tp, ap) => new { Id = ap.Id_performance, ap.Date, ap.Time, tp.Seat, tp.User_Id })
                     .Join(db.GetTable<TAfisha>(),
                       tp => tp.Id,
                       ap => ap.Id,
