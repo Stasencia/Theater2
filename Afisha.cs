@@ -21,7 +21,7 @@ namespace Project_theater
     public partial class Afisha : MetroForm
     {
         MainForm mainForm;
-        Performance_list f;
+        Performance_list performance_list;
         public Afisha(MainForm main)
         {
             InitializeComponent();
@@ -32,11 +32,11 @@ namespace Project_theater
         {
             int i = 0;
             Months m;
-            f = new Performance_list();
-            f.MdiParent = this;
-            f.Top = metroPanel1.Bottom;
-            f.Show();
-            f.Performance_Create();
+            performance_list = new Performance_list();
+            performance_list.MdiParent = this;
+            performance_list.Top = metroPanel1.Bottom;
+            performance_list.Show();
+            performance_list.Basic_text();
             DataContext db = new DataContext(DB_connection.connectionString);
             var query2 = db.GetTable<TAfisha_dates>()
                          .Where(k => k.Date >= DateTime.Now)
@@ -86,9 +86,9 @@ namespace Project_theater
 
         private void button1_Click(object sender, EventArgs e)
         {
-            f.Month_id = Convert.ToInt32(((Control)sender).Tag);
-            f.Refresh(Convert.ToInt32(((Control)sender).Tag));
-            f.Show();
+            performance_list.Month_id = Convert.ToInt32(((Control)sender).Tag);
+            performance_list.Refresh(Convert.ToInt32(((Control)sender).Tag));
+            performance_list.Show();
         }
     }
 }

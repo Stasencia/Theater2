@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MetroFramework;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Linq;
@@ -119,6 +120,31 @@ namespace Project_theater
                 i++;
             }
             panel.Size = new Size(panel.Width, 352);
+        }
+
+        public static int Ticket_purchase(Panel panel, int perf_info_id, float price, Ticket_purchase form)
+        {
+            int k = 0;
+            TTickets ticket;
+            DataContext db = new DataContext(DB_connection.connectionString);
+            for (int i = 0; i < panel.Controls.Count; i++)
+            {
+                if (panel.Controls["button" + (i + 1)].BackColor == Color.MediumTurquoise)
+                {
+                    ticket = new TTickets() { User_Id = Program.user.ID, Performance_info_id = perf_info_id, Seat = i, Price = price };
+                    db.GetTable<TTickets>().InsertOnSubmit(ticket);
+                    k++;
+                    panel.Controls["button" + (i + 1)].BackColor = Color.DarkGray;
+                    panel.Controls["button" + (i + 1)].Enabled = false;
+                }
+            }
+            if (k != 0)
+            {
+                db.SubmitChanges();
+                MetroMessageBox.Show(form, "Билеты были успешно заказаны!", "", MessageBoxButtons.OK, MessageBoxIcon.Asterisk, 100);
+                return 0;
+            }
+            return 1;
         }
     }
 }

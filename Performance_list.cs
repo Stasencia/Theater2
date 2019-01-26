@@ -28,7 +28,7 @@ namespace Project_theater
             this.Parent.Parent.Hide();
         }
 
-        public void Performance_Create()
+        public void Basic_text()
         {
             Controls.Clear();
             Label l = new Label();

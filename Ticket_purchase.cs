@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.Linq;
 using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
@@ -80,20 +81,15 @@ namespace Project_theater
                 b.Click += new System.EventHandler(this.button_Click);
                 b.BackColor = Color.White;
             }
-            using (SqlConnection connection = new SqlConnection(DB_connection.connectionString))
+
+            DataContext db = new DataContext(DB_connection.connectionString);
+            var query = db.GetTable<TTickets>()
+                    .Where(k => k.Performance_info_id == perf_info_id)
+                    .Select(k => k.Seat);
+            foreach(var q in query)
             {
-                await connection.OpenAsync();
-                SqlCommand command = new SqlCommand("SELECT Seat FROM Tickets WHERE Date = @Date", connection);
-                command.Parameters.AddWithValue("@Date", Performance_class.Date);
-                SqlDataReader reader = command.ExecuteReader();
-                if (reader.HasRows)
-                {
-                    while (reader.Read())
-                    {
-                        panel2.Controls["button" + (Convert.ToInt32((reader.GetValue(0))) + 1)].BackColor = Color.DarkGray;
-                        panel2.Controls["button" + (Convert.ToInt32((reader.GetValue(0))) + 1)].Enabled = false;
-                    }
-                }
+                panel2.Controls["button" + (q + 1)].BackColor = Color.DarkGray;
+                panel2.Controls["button" + (q + 1)].Enabled = false;
             }
         }
 
@@ -109,31 +105,10 @@ namespace Project_theater
             Price_count();
         }
 
-        private async void button77_Click(object sender, EventArgs e)
+        private void button77_Click(object sender, EventArgs e)
         {
-            int k = 0;
-            using (SqlConnection connection = new SqlConnection(DB_connection.connectionString))
-            {
-                await connection.OpenAsync();
-                for (int i = 0; i < panel2.Controls.Count; i++)
-                {
-                    if (panel2.Controls["button" + (i+1)].BackColor == Color.MediumTurquoise)
-                    {
-                        SqlCommand command = new SqlCommand("INSERT INTO [Tickets] (User_Id, Performance_Id, Date, Seat, Price) VALUES(@User, @Perf, @Date, @Seat, @Price)", connection);
-                        command.Parameters.AddWithValue("@User", Program.user.ID);
-                        command.Parameters.AddWithValue("@Perf", Performance_class.Id);
-                        command.Parameters.AddWithValue("@Date", Performance_class.Date);
-                        command.Parameters.AddWithValue("@Seat", i);
-                        command.Parameters.AddWithValue("@Price", price);
-                        await command.ExecuteNonQueryAsync();
-                        k++;
-                    }
-
-                }
-                if(k!=0)
-                    MetroMessageBox.Show(this, "Билеты были успешно заказаны!", "", MessageBoxButtons.OK, MessageBoxIcon.Asterisk, 100);
-                    
-            }
+            Ticket.Ticket_purchase(panel2, perf_info_id, price, this);
+            Price_count();       
         }
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
