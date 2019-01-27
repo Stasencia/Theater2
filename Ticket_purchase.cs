@@ -107,8 +107,12 @@ namespace Project_theater
 
         private void button77_Click(object sender, EventArgs e)
         {
-            Ticket.Ticket_purchase(panel2, perf_info_id, price, this);
-            Price_count();       
+            if(Ticket.Ticket_purchase(panel2, perf_info_id, price, this) == 0)
+            {
+                label4.Text = "Цена: 0 грн.";
+                button77.Enabled = false;
+                button77.BackColor = Color.DarkGray; 
+            }       
         }
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)

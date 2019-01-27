@@ -29,6 +29,7 @@ namespace Project_theater
                       (tp, ap) => new { ap.Name, tp.Date, tp.Time, tp.Seat, ap.Small_image, tp.User_Id })
                   .Where(k => k.User_Id == Program.user.ID)
                   .GroupBy(x => new { x.Name, x.Date, x.Time, x.Small_image })
+                  .OrderByDescending(x => x.Key.Date)
                   .Select(x => new Ticket_sell_info { Name = x.Key.Name, Date = x.Key.Date, Time = x.Key.Time, Small_image = x.Key.Small_image, Count = x.Select(d => d.Seat).Count(), Seats = x.Select(d => d.Seat) });
 
             return ticket_Sell_Infos;
@@ -138,13 +139,17 @@ namespace Project_theater
                     panel.Controls["button" + (i + 1)].Enabled = false;
                 }
             }
-            if (k != 0)
+            try
             {
                 db.SubmitChanges();
-                MetroMessageBox.Show(form, "Билеты были успешно заказаны!", "", MessageBoxButtons.OK, MessageBoxIcon.Asterisk, 100);
-                return 0;
             }
-            return 1;
+            catch(Exception e)
+            {
+                MetroMessageBox.Show(form, e.Message, "", MessageBoxButtons.OK, MessageBoxIcon.Error, 100);
+                return 1;
+            }
+            MetroMessageBox.Show(form, "Билеты были успешно заказаны!", "", MessageBoxButtons.OK, MessageBoxIcon.Asterisk, 100);
+            return 0;   
         }
     }
 }
