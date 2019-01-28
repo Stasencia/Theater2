@@ -31,6 +31,7 @@ namespace Project_theater
         {
             string[] words = ((Control)sender).Tag.ToString().Split(';');
             DateTime d = new DateTime(Convert.ToInt32(words[1]), Convert.ToInt32(words[0]), 1);
+            DateTime d1 = new DateTime(Convert.ToInt32(words[1]), Convert.ToInt32(words[0]), 1);
             while (d.DayOfWeek != DayOfWeek.Monday)
             {
                 d = d.AddDays(-1);
@@ -43,7 +44,7 @@ namespace Project_theater
                 Controls["b" + (i + 1)].Tag = d.Year + "-" + d.Month + "-" + d.Day;
                 d = d.AddDays(1);
             }
-            using (SqlConnection connection = new SqlConnection(DB_connection.connectionString))
+            /*using (SqlConnection connection = new SqlConnection(DB_connection.connectionString))
             {
                 await connection.OpenAsync();
                 SqlCommand command = new SqlCommand("SELECT Id_performance, Date, DAY(Date) AS day, Afisha.Small_image FROM [Afisha_dates] LEFT JOIN[Afisha] ON Afisha_dates.Id_performance = Afisha.Id WHERE Id_performance = @Id AND MONTH(Date) = @month AND YEAR(Date) = @year", connection);
@@ -68,8 +69,26 @@ namespace Project_theater
                         }
                     }
                 }
+            }*/
+            DataContext db = new DataContext(DB_connection.connectionString);
+            var query = db.GetTable<TAfisha>()
+                        .Where(k => k.Id == perf_id)
+                        .Join(db.GetTable<TAfisha_dates>(),
+                              tp => tp.Id,
+                              ap => ap.Id_performance,
+                              (tp, ap) => new { tp.Small_image, ap.Date })
+                              .Where(k => k.Date >=d1 && k.Date >= DateTime.Now);
+            var buttons = Controls.OfType<Button>().Where(k => k.Name.StartsWith("b"))
+                            .Join(query,
+                                button => Convert.ToDateTime(button.Tag),
+                                afisha_info => afisha_info.Date,
+                                (button, afisha_info) => new { button, afisha_info });
+            foreach(var b in buttons)
+            {
+                string s = DB_connection.current_directory + "images_afisha\\" + b.afisha_info.Small_image;
+                b.button.Enabled = true;
+                b.button.BackgroundImage = new Bitmap(@s);
             }
-
         }
 
         private async void Performance_Load(object sender, EventArgs e)

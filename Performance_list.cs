@@ -44,11 +44,12 @@ namespace Project_theater
 
         public void Refresh(int month)
         {
+            Month_id = month;
             Controls.Clear();
             int i = 0;
             DataContext db = new DataContext(DB_connection.connectionString);
             var query2 = db.GetTable<TAfisha_dates>()
-                        .Where(k => k.Date.Month == month && k.Date >= DateTime.Now)
+                        .Where(k => k.Date.Month == Month_id && k.Date >= DateTime.Now)
                         .Select(k => k.Id_performance)
                         .Distinct().ToArray();
             var query1 = db.GetTable<TAfisha>()

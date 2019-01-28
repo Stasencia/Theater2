@@ -83,6 +83,7 @@
     <Compile Include="Editing.Designer.cs">
       <DependentUpon>Editing.cs</DependentUpon>
     </Compile>
+    <Compile Include="Form_customization.cs" />
     <Compile Include="My_Account.cs">
       <SubType>Form</SubType>
     </Compile>

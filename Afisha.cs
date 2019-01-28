@@ -30,20 +30,25 @@ namespace Project_theater
 
         private void Afisha_Load(object sender, EventArgs e)
         {
-            int i = 0;
-            Months m;
             performance_list = new Performance_list();
             performance_list.MdiParent = this;
             performance_list.Top = metroPanel1.Bottom;
             performance_list.Show();
             performance_list.Basic_text();
+            Month_buttons();
+        }
+
+        private void Month_buttons()
+        {
+            int i = 0;
+            Months m;
             DataContext db = new DataContext(DB_connection.connectionString);
             var query2 = db.GetTable<TAfisha_dates>()
                          .Where(k => k.Date >= DateTime.Now)
                          .GroupBy(row =>
                             new
                             {
-                                Year = row.Date.Year,  
+                                Year = row.Date.Year,
                                 Month = row.Date.Month
                             },
                             (key, group) => new
@@ -54,7 +59,7 @@ namespace Project_theater
                             .OrderBy(k => k.key1).ThenBy(k => k.key2)
                             .Take(4);
 
-            foreach(var q in query2)
+            foreach (var q in query2)
             {
                 Button b = new Button();
                 b.FlatStyle = FlatStyle.Flat;
@@ -68,8 +73,8 @@ namespace Project_theater
                 b.Click += new System.EventHandler(this.button1_Click);
                 panel1.Controls.Add(b);
                 i++;
-            } 
-                   
+            }
+
             int j = 0;
             int o = (797 - (82 * i + (i - 1) * 22)) / 2;
             foreach (Button b in panel1.Controls)
@@ -86,7 +91,6 @@ namespace Project_theater
 
         private void button1_Click(object sender, EventArgs e)
         {
-            performance_list.Month_id = Convert.ToInt32(((Control)sender).Tag);
             performance_list.Refresh(Convert.ToInt32(((Control)sender).Tag));
             performance_list.Show();
         }
