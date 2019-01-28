@@ -163,6 +163,7 @@
     </Compile>
     <Compile Include="Ticket_sell_info.cs" />
     <Compile Include="TTickets.cs" />
+    <Compile Include="TUsers.cs" />
     <Compile Include="User.cs" />
     <EmbeddedResource Include="Authorization.resx">
       <DependentUpon>Authorization.cs</DependentUpon>

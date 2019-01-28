@@ -34,13 +34,11 @@ namespace Project_theater
         private void MainForm_Load(object sender, EventArgs e)
         {
             metroLabel6.Text = "Театр имени \nОльги Кобылянской";
-            DB_connection.connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\Stasia\Desktop\Project_theater\DB_Theater.mdf;Integrated Security=True";
-            DB_connection.current_directory = Environment.CurrentDirectory + "\\";
             if(Program.user.Right == 1)
             {
                 label1.Text = "Редактирование афиши";
                 label1.AutoSize = true;
-                label1.Location = new Point(label1.Location.X-110,label1.Location.Y);
+                label1.Location = new Point(label1.Location.X-80,label1.Location.Y);
             }
         }
 
@@ -56,11 +54,6 @@ namespace Project_theater
             Authorization form = new Authorization();
             form.Show();
             this.Hide();
-        }
-
-        private void metroLabel3_MouseClick(object sender, MouseEventArgs e)
-        {
-           
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)

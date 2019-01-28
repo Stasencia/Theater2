@@ -25,7 +25,7 @@ namespace Project_theater
 
         private void Registration_FormClosing(object sender, FormClosingEventArgs e)
         {
-            MainForm f = new MainForm(Program.user.ID + 1);
+            MainForm f = new MainForm(Program.user.ID);
             f.Show();
             this.Hide();
         }

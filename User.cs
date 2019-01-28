@@ -1,6 +1,7 @@
 ﻿using MetroFramework;
 using System;
 using System.Collections.Generic;
+using System.Data.Linq;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
@@ -28,49 +29,57 @@ namespace Project_theater
             return instance;
         }
 
-        public async void Registration(Form sender, string login, string password)
+        public void Registration(Form sender, string login, string password)
         {
             if (!string.IsNullOrWhiteSpace(login) && !string.IsNullOrEmpty(login) &&
            !string.IsNullOrWhiteSpace(password) && !string.IsNullOrEmpty(password))
             {
-                using (SqlConnection connection = new SqlConnection(DB_connection.connectionString))
+                DataContext db = new DataContext(DB_connection.connectionString);
+                var query = db.GetTable<TUsers>()
+                    .Any(k => k.Login == login);
+                if (!query)
                 {
-                    await connection.OpenAsync();
-                    SqlCommand selection_com = new SqlCommand("SELECT * FROM Users", connection);
-                    SqlDataReader reader = await selection_com.ExecuteReaderAsync();
-                    if (reader.HasRows)
+                    TUsers user = new TUsers() { Login = login, Password = password };
+                    db.GetTable<TUsers>().InsertOnSubmit(user);
+                    try
                     {
-                        while (reader.Read())
-                        {
-                            ID = int.Parse(reader.GetValue(0).ToString());
-                            if (reader.GetValue(1).ToString() == login)
-                            {
-                                ID = 0;
-                                break;
-                            }
-                        }
+                        db.SubmitChanges();
                     }
-                    reader.Close();
-                }
-                using (SqlConnection connection = new SqlConnection(DB_connection.connectionString))
-                {
-                    await connection.OpenAsync();
-                    if (ID != 0)
+                    catch (Exception e)
                     {
-                        SqlCommand command = new SqlCommand("INSERT INTO [Users] (Login, Password) VALUES(@Login, @Password)", connection);
-                        command.Parameters.AddWithValue("Login", login);
-                        command.Parameters.AddWithValue("Password", password);
-                        await command.ExecuteNonQueryAsync();
-                        MetroMessageBox.Show(sender, "Вы были успешно зарегистрированы!", "", MessageBoxButtons.OK, MessageBoxIcon.Asterisk, 120);
+                        MetroMessageBox.Show(sender, e.Message, "", MessageBoxButtons.OK, MessageBoxIcon.Error, 100);
                     }
-                    else
-                        MetroMessageBox.Show(sender, "Данный логин уже занят", "Значение логина", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, 120);
+                    MetroMessageBox.Show(sender, "Вы были успешно зарегистрированы!", "", MessageBoxButtons.OK, MessageBoxIcon.Asterisk, 120);
+                    ID = user.Id;
+                    sender.Close();
                 }
-
+                else
+                    MetroMessageBox.Show(sender, "Данный логин уже занят", "Значение логина", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, 120);
             }
             else
                 MetroMessageBox.Show(sender, "Заполните все необходимые поля", "Ошибка заполнения", MessageBoxButtons.OK, MessageBoxIcon.Error, 120);
+        }
 
+        public void Authorization(Form sender, string login, string password)
+        {
+            if (!string.IsNullOrWhiteSpace(login) && !string.IsNullOrEmpty(login) &&
+            !string.IsNullOrWhiteSpace(password) && !string.IsNullOrEmpty(password))
+            {
+                DataContext db = new DataContext(DB_connection.connectionString);
+                var query = db.GetTable<TUsers>()
+                            .FirstOrDefault(k => k.Login == login && k.Password == password);
+                if (query != null)
+                {
+                    Program.user.ID = query.Id;
+                    Program.user.Right = query.Rights;
+                    MetroMessageBox.Show(sender, "Добро пожаловать!", "", MessageBoxButtons.OK, MessageBoxIcon.Asterisk, 120); ;
+                    sender.Close();
+                }
+                else
+                    MetroMessageBox.Show(sender, "Пользователя с таким логином и паролем нет в базе данных", "Ошибка авторизации", MessageBoxButtons.OK, MessageBoxIcon.Error, 150);
+            }
+            else
+                MetroMessageBox.Show(sender, "Заполните все необходимые поля", "Ошибка заполнения", MessageBoxButtons.OK, MessageBoxIcon.Error, 120);
         }
     }
 }

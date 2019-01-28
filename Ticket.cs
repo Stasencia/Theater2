@@ -125,7 +125,6 @@ namespace Project_theater
 
         public static int Ticket_purchase(Panel panel, int perf_info_id, float price, Ticket_purchase form)
         {
-            int k = 0;
             TTickets ticket;
             DataContext db = new DataContext(DB_connection.connectionString);
             for (int i = 0; i < panel.Controls.Count; i++)
@@ -134,7 +133,6 @@ namespace Project_theater
                 {
                     ticket = new TTickets() { User_Id = Program.user.ID, Performance_info_id = perf_info_id, Seat = i, Price = price };
                     db.GetTable<TTickets>().InsertOnSubmit(ticket);
-                    k++;
                     panel.Controls["button" + (i + 1)].BackColor = Color.DarkGray;
                     panel.Controls["button" + (i + 1)].Enabled = false;
                 }
