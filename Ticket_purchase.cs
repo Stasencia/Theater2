@@ -18,8 +18,8 @@ namespace Project_theater
     {
         Performance perf_form;
         int perf_info_id;
-        float price;
-
+        float price, initial_price;
+        DataContext db = new DataContext(DB_connection.connectionString);
         public Ticket_purchase(Performance form, int info)
         {
             InitializeComponent();
@@ -57,6 +57,18 @@ namespace Project_theater
 
         private async void Ticket_purchase_Load(object sender, EventArgs e)
         {
+            //var query1 = db.GetTable<TAfisha_dates>()
+            //            .Where(l => l.Id == perf_info_id)
+            //            .Join(db.GetTable<TAfisha>(),
+            //                a => a.Id_performance,
+            //                b => b.Id,
+            //                (a, b) => new { a.Date, a.Time, b.Duration, b.Image, b.Id }).First();
+            //label5.Text = "Дата: " + query1.Date.ToShortDateString();
+            //label1.Text = "Начало: " + query1.Time;
+            //label2.Text = query1.Duration;
+            //string s = DB_connection.current_directory + "images_afisha\\" + query1.Image;
+            //panel1.BackgroundImage = new Bitmap(@s);
+            //initial_price = query1.Price;
             using (SqlConnection connection = new SqlConnection(DB_connection.connectionString))
             {
                 await connection.OpenAsync();
@@ -64,7 +76,7 @@ namespace Project_theater
                 command.Parameters.AddWithValue("@Id", perf_info_id);
                 SqlDataReader reader = command.ExecuteReader();
                 if (reader.Read())
-                {    
+                {
                     Performance_class.Date = Convert.ToDateTime(reader.GetValue(0));
                     Performance_class.Id = Convert.ToInt32(reader.GetValue(4));
                     Performance_class.Price = Convert.ToSingle(reader.GetValue(5));
@@ -75,14 +87,13 @@ namespace Project_theater
                     panel1.BackgroundImage = new Bitmap(@s);
                 }
             }
-            foreach(Button b in panel2.Controls)
+            foreach (Button b in panel2.Controls)
             {
                 b.TabStop = false;
                 b.Click += new System.EventHandler(this.button_Click);
                 b.BackColor = Color.White;
             }
-
-            DataContext db = new DataContext(DB_connection.connectionString);
+            
             var query = db.GetTable<TTickets>()
                     .Where(k => k.Performance_info_id == perf_info_id)
                     .Select(k => k.Seat);

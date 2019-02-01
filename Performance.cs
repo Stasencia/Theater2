@@ -155,41 +155,21 @@ namespace Project_theater
             p.TextAlign = ContentAlignment.TopLeft;
         }
 
-        private async void button_MouseEnter(object sender, EventArgs e)
+        private void button_MouseEnter(object sender, EventArgs e)
         {
             Button p = (Button)sender;
             p.Height = 110;
             p.Width = 110;
             p.Location = new Point(p.Location.X - 10, p.Location.Y - 10);
-            using (SqlConnection connection = new SqlConnection(DB_connection.connectionString))
-            {
-                await connection.OpenAsync();
-                SqlCommand command = new SqlCommand("SELECT * FROM [Afisha] WHERE Id = @Id", connection);
-                command.Parameters.AddWithValue("@Id", perf_id);
-                SqlDataReader reader = command.ExecuteReader();
-                if (reader.Read())
-                {
-                    string s = DB_connection.current_directory + "images_afisha\\" + reader.GetValue(11).ToString();
-                    p.BackgroundImage = new Bitmap(@s);
-                }
-            }
-            string date = ((Button)sender).Tag.ToString();
-            using (SqlConnection connection = new SqlConnection(DB_connection.connectionString))
-            {
-                await connection.OpenAsync();
-                SqlCommand command = new SqlCommand("SELECT Time, Id FROM Afisha_dates WHERE Id_performance = @Id AND Date = @date", connection);
-                command.Parameters.AddWithValue("@Id", perf_id);
-                command.Parameters.AddWithValue("@date", date);
-                SqlDataReader reader = command.ExecuteReader();
-                if (reader.Read())
-                {
-                    p.Text = reader.GetValue(0).ToString();
-                    p.Font = new Font("Century Gothic", 11, FontStyle.Bold);
-                    p.ForeColor = Color.White;
-                    p.TextAlign = ContentAlignment.BottomLeft;
-                    perf_info_id = Convert.ToInt32(reader.GetValue(1));
-                }
-            }
+            DateTime date = Convert.ToDateTime(((Button)sender).Tag);
+            var query = db.GetTable<TAfisha_dates>()
+                        .Where(l => l.Id_performance == perf_id && l.Date == date)
+                        .Select(l => new { l.Time, l.Id}).First();
+            p.Text = query.Time;
+            p.Font = new Font("Century Gothic", 11, FontStyle.Bold);
+            p.ForeColor = Color.White;
+            p.TextAlign = ContentAlignment.BottomLeft;
+            perf_info_id = Convert.ToInt32(query.Id);
             p.BringToFront();
         }
 

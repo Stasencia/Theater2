@@ -10,7 +10,14 @@ namespace Project_theater
     {
         public static int Id;
         public static string Name;
+        public static string Time;
         public static DateTime Date;
         public static float Price;
+
+        //public int Id { get; set; }
+        //public string Name { get; set; }
+        //public string Time { get; set; }
+        //public DateTime Date { get; set; }
+        //public float Price { get; set; }
     }
 }
