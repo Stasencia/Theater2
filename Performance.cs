@@ -19,6 +19,7 @@ namespace Project_theater
         public int Month_id { get; set; }
         int perf_id, perf_info_id;
         Afisha a;
+        DataContext db = new DataContext(DB_connection.connectionString);
         public Performance(int perf_id, Afisha a, int Month_id)
         {
             InitializeComponent();
@@ -27,7 +28,7 @@ namespace Project_theater
             this.Month_id = Month_id;
         }
 
-        private async void Button_customization(object sender, EventArgs args)
+        private void Button_customization(object sender, EventArgs args)
         {
             string[] words = ((Control)sender).Tag.ToString().Split(';');
             DateTime d = new DateTime(Convert.ToInt32(words[1]), Convert.ToInt32(words[0]), 1);
@@ -44,33 +45,7 @@ namespace Project_theater
                 Controls["b" + (i + 1)].Tag = d.Year + "-" + d.Month + "-" + d.Day;
                 d = d.AddDays(1);
             }
-            /*using (SqlConnection connection = new SqlConnection(DB_connection.connectionString))
-            {
-                await connection.OpenAsync();
-                SqlCommand command = new SqlCommand("SELECT Id_performance, Date, DAY(Date) AS day, Afisha.Small_image FROM [Afisha_dates] LEFT JOIN[Afisha] ON Afisha_dates.Id_performance = Afisha.Id WHERE Id_performance = @Id AND MONTH(Date) = @month AND YEAR(Date) = @year", connection);
-                command.Parameters.AddWithValue("@Id", perf_id);
-                command.Parameters.AddWithValue("@month", Convert.ToInt32(words[0]));
-                command.Parameters.AddWithValue("@year", Convert.ToInt32(words[1]));
-                SqlDataReader reader = command.ExecuteReader();
-                if (reader.HasRows)
-                {
-                    while (reader.Read())
-                    {
-                        DateTime reader_date = Convert.ToDateTime(reader.GetValue(1));
-                        for (int i = 0; i < 42; i++)
-                        {
-                            DateTime button_date = Convert.ToDateTime(Controls["b" + (i + 1)].Tag);
-                            if (button_date == reader_date && reader_date >= DateTime.Now)
-                            {
-                                string s = DB_connection.current_directory + "images_afisha\\" + reader.GetValue(3).ToString();
-                                Controls["b" + (i + 1)].Enabled = true;
-                                Controls["b" + (i + 1)].BackgroundImage = new Bitmap(@s);
-                            }
-                        }
-                    }
-                }
-            }*/
-            DataContext db = new DataContext(DB_connection.connectionString);
+            
             var query = db.GetTable<TAfisha>()
                         .Where(k => k.Id == perf_id)
                         .Join(db.GetTable<TAfisha_dates>(),
@@ -91,32 +66,29 @@ namespace Project_theater
             }
         }
 
-        private async void Performance_Load(object sender, EventArgs e)
+        private void Performance_Load(object sender, EventArgs e)
         {
+            string s;
             Button push = new Button();
             AutoSize = false;
             Size = new Size(797, 530);
-            using (SqlConnection connection = new SqlConnection(DB_connection.connectionString))
-            {
-                await connection.OpenAsync();
-                SqlCommand command = new SqlCommand("SELECT * FROM [Afisha] WHERE Id = @Id", connection);
-                command.Parameters.AddWithValue("@Id", perf_id);
-                SqlDataReader reader = command.ExecuteReader();
-                if (reader.Read())
-                {
-                    string s = DB_connection.current_directory + "images_afisha\\" + reader.GetValue(6).ToString();
-                    panel1.BackgroundImage = new Bitmap(@s);
-                    label1.Text = reader.GetValue(10).ToString();
-                    label2.Text = reader.GetValue(7).ToString() + "\n" + reader.GetValue(8).ToString() + "\n" + reader.GetValue(9).ToString();
-                    label7.Text = reader.GetValue(3).ToString();
-                    label8.Text = reader.GetValue(4).ToString();
-                    label9.Text = reader.GetValue(5).ToString();
-                }
-            }
 
+            var query1 = db.GetTable<TAfisha>()
+                            .Where(l => l.Id == perf_id)
+                            .Select(l => new { l.Big_image, l.Small_name, l.Small_info1, l.Small_info2, l.Small_info3, l.Duration, l.Age_restriction, l.Description});
+            foreach(var q in query1)
+            {
+                s = DB_connection.current_directory + "images_afisha\\" + q.Big_image;
+                panel1.BackgroundImage = new Bitmap(@s);
+                label1.Text = q.Small_name;
+                label2.Text = q.Small_info1 + "\n" + q.Small_info2 + "\n" + q.Small_info3;
+                label7.Text = q.Duration;
+                label8.Text = q.Age_restriction;
+                label9.Text = q.Description;
+            }
+        
             label9.Height = (int)(((label9.Text.Length * label9.Font.SizeInPoints) / label9.Width + label9.Text.Where(x => x == '\n').Count()) * label9.Font.Height);
 
-            DataContext db = new DataContext(DB_connection.connectionString);
             var query = db.GetTable<TAfisha_dates>()
                         .Where(l => l.Id_performance == perf_id && l.Date >= DateTime.Now)
                         .Select(l => new { l.Date.Month, l.Date.Year })
