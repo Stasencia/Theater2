@@ -34,6 +34,6 @@ namespace Project_theater
         [Column]
         public string Small_image { get; set; }
         [Column]
-        public float Price { get; set; }
+        public double Price { get; set; }
     }
 }

@@ -123,7 +123,7 @@ namespace Project_theater
             panel.Size = new Size(panel.Width, 352);
         }
 
-        public static int Ticket_purchase(Panel panel, int perf_info_id, float price, Ticket_purchase form)
+        public static int Ticket_purchase(Panel panel, int perf_info_id, double price, Ticket_purchase form)
         {
             TTickets ticket;
             DataContext db = new DataContext(DB_connection.connectionString);

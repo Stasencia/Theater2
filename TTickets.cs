@@ -19,6 +19,6 @@ namespace Project_theater
         [Column]
         public int Seat { get; set; }
         [Column]
-        public float Price { get; set; }
+        public double Price { get; set; }
     }
 }

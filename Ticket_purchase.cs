@@ -18,7 +18,8 @@ namespace Project_theater
     {
         Performance perf_form;
         int perf_info_id;
-        float price, initial_price;
+        double price;
+        double initial_price;
         DataContext db = new DataContext(DB_connection.connectionString);
         public Ticket_purchase(Performance form, int info)
         {
@@ -40,9 +41,9 @@ namespace Project_theater
                 if(panel2.Controls["button" + (i + 1)].BackColor == Color.MediumTurquoise)
                 {
                     if (i < 44)
-                        price += Performance_class.Price;
+                        price += initial_price;
                     else
-                        price += Performance_class.Price - 10;
+                        price += initial_price - 10;
                     if (checkBox1.Checked)
                         price = price * (float)0.75;
                 }
@@ -55,38 +56,21 @@ namespace Project_theater
             }
         }
 
-        private async void Ticket_purchase_Load(object sender, EventArgs e)
+        private void Ticket_purchase_Load(object sender, EventArgs e)
         {
-            //var query1 = db.GetTable<TAfisha_dates>()
-            //            .Where(l => l.Id == perf_info_id)
-            //            .Join(db.GetTable<TAfisha>(),
-            //                a => a.Id_performance,
-            //                b => b.Id,
-            //                (a, b) => new { a.Date, a.Time, b.Duration, b.Image, b.Id }).First();
-            //label5.Text = "Дата: " + query1.Date.ToShortDateString();
-            //label1.Text = "Начало: " + query1.Time;
-            //label2.Text = query1.Duration;
-            //string s = DB_connection.current_directory + "images_afisha\\" + query1.Image;
-            //panel1.BackgroundImage = new Bitmap(@s);
-            //initial_price = query1.Price;
-            using (SqlConnection connection = new SqlConnection(DB_connection.connectionString))
-            {
-                await connection.OpenAsync();
-                SqlCommand command = new SqlCommand("SELECT Afisha_dates.Date, Afisha_dates.Time, Afisha.Duration, Afisha.Image, Afisha.Id, Afisha.Price FROM Afisha_dates LEFT JOIN Afisha ON Afisha_dates.Id_performance = Afisha.Id WHERE Afisha_dates.Id = @Id", connection);
-                command.Parameters.AddWithValue("@Id", perf_info_id);
-                SqlDataReader reader = command.ExecuteReader();
-                if (reader.Read())
-                {
-                    Performance_class.Date = Convert.ToDateTime(reader.GetValue(0));
-                    Performance_class.Id = Convert.ToInt32(reader.GetValue(4));
-                    Performance_class.Price = Convert.ToSingle(reader.GetValue(5));
-                    label5.Text = "Дата: " + Performance_class.Date.ToShortDateString();
-                    label1.Text = "Начало: " + reader.GetValue(1).ToString();
-                    label2.Text = reader.GetValue(2).ToString();
-                    string s = DB_connection.current_directory + "images_afisha\\" + reader.GetValue(3).ToString();
-                    panel1.BackgroundImage = new Bitmap(@s);
-                }
-            }
+            var query1 = db.GetTable<TAfisha_dates>()
+                        .Where(l => l.Id == perf_info_id)
+                        .Join(db.GetTable<TAfisha>(),
+                            a => a.Id_performance,
+                            b => b.Id,
+                            (a, b) => new { a.Date, a.Time, b.Duration, b.Image, b.Id, b.Price }).First();
+            label5.Text = "Дата: " + query1.Date.ToShortDateString();
+            label1.Text = "Начало: " + query1.Time;
+            label2.Text = query1.Duration;
+            string s = DB_connection.current_directory + "images_afisha\\" + query1.Image;
+            panel1.BackgroundImage = new Bitmap(@s);
+            initial_price = query1.Price;
+           
             foreach (Button b in panel2.Controls)
             {
                 b.TabStop = false;
