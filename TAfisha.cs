@@ -35,5 +35,7 @@ namespace Project_theater
         public string Small_image { get; set; }
         [Column]
         public double Price { get; set; }
+        [Column]
+        public bool Is_relevant { get; set; }
     }
 }

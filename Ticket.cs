@@ -26,11 +26,11 @@ namespace Project_theater
                     .Join(db.GetTable<TAfisha>(),
                       tp => tp.Id,
                       ap => ap.Id,
-                      (tp, ap) => new { ap.Name, tp.Date, tp.Time, tp.Seat, ap.Small_image, tp.User_Id })
+                      (tp, ap) => new { ap.Name, tp.Date, tp.Time, tp.Seat, ap.Small_image, tp.User_Id, ap.Is_relevant })
                   .Where(k => k.User_Id == Program.user.ID)
-                  .GroupBy(x => new { x.Name, x.Date, x.Time, x.Small_image })
+                  .GroupBy(x => new { x.Name, x.Date, x.Time, x.Small_image, x.Is_relevant })
                   .OrderByDescending(x => x.Key.Date)
-                  .Select(x => new Ticket_sell_info { Name = x.Key.Name, Date = x.Key.Date, Time = x.Key.Time, Small_image = x.Key.Small_image, Count = x.Select(d => d.Seat).Count(), Seats = x.Select(d => d.Seat) });
+                  .Select(x => new Ticket_sell_info { Name = x.Key.Name, Date = x.Key.Date, Time = x.Key.Time, Small_image = x.Key.Small_image, Is_relevant = x.Key.Is_relevant, Count = x.Select(d => d.Seat).Count(), Seats = x.Select(d => d.Seat) });
 
             return ticket_Sell_Infos;
         }
@@ -68,6 +68,16 @@ namespace Project_theater
                 l1.Text = st;
                 l1.AutoSize = true;
                 l1.Font = new Font("Century Gothic", 11, FontStyle.Regular);
+                panel.Controls.Add(l1);
+                if (q.Date >= DateTime.Now && q.Is_relevant == false)
+                {
+                    Label cancelled = new Label();
+                    cancelled.Location = new Point(l1.Left + l1.Width + 15, 74 + i * 140);
+                    cancelled.Text = "Отменен!";
+                    cancelled.Font = new Font("Century Gothic", 11, FontStyle.Regular);
+                    cancelled.ForeColor = Color.Red;
+                    panel.Controls.Add(cancelled);
+                }         
 
                 l2.Location = new Point(215, 101 + i * 140);
                 st = "Дата: " + Convert.ToDateTime(q.Date).ToShortDateString() + "    Время: " + q.Time;
@@ -114,7 +124,7 @@ namespace Project_theater
                 l4.AutoSize = true;
 
                 panel.Controls.Add(p);
-                panel.Controls.Add(l1);
+                
                 panel.Controls.Add(l2);
                 panel.Controls.Add(l3);
                 panel.Controls.Add(l4);

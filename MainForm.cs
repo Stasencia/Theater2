@@ -72,7 +72,7 @@ namespace Project_theater
         {
             if (Program.user.Right == 1)
             {
-                Editing form = new Editing(this);
+                Editing_performance_list form = new Editing_performance_list(this);
                 form.Show();
             }
             else

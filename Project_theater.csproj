@@ -83,6 +83,12 @@
     <Compile Include="Editing.Designer.cs">
       <DependentUpon>Editing.cs</DependentUpon>
     </Compile>
+    <Compile Include="Editing_performance_list.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editing_performance_list.Designer.cs">
+      <DependentUpon>Editing_performance_list.cs</DependentUpon>
+    </Compile>
     <Compile Include="Form_customization.cs" />
     <Compile Include="My_Account.cs">
       <SubType>Form</SubType>
@@ -165,6 +171,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Editing.resx">
       <DependentUpon>Editing.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editing_performance_list.resx">
+      <DependentUpon>Editing_performance_list.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My_Account.resx">
       <DependentUpon>My_Account.cs</DependentUpon>

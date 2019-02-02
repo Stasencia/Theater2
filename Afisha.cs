@@ -43,8 +43,9 @@ namespace Project_theater
             int i = 0;
             Months m;
             DataContext db = new DataContext(DB_connection.connectionString);
+            var query1 = db.GetTable<TAfisha>().Where(k => k.Is_relevant == true).Select(k => k.Id);
             var query2 = db.GetTable<TAfisha_dates>()
-                         .Where(k => k.Date >= DateTime.Now)
+                         .Where(k => k.Date >= DateTime.Now && query1.Contains(k.Id_performance))
                          .GroupBy(row =>
                             new
                             {
