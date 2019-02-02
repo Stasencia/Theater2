@@ -96,12 +96,6 @@
     <Compile Include="Performance.Designer.cs">
       <DependentUpon>Performance.cs</DependentUpon>
     </Compile>
-    <Compile Include="Change_info.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Change_info.Designer.cs">
-      <DependentUpon>Change_info.cs</DependentUpon>
-    </Compile>
     <Compile Include="DB_connection.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
@@ -177,9 +171,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Performance.resx">
       <DependentUpon>Performance.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Change_info.resx">
-      <DependentUpon>Change_info.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>

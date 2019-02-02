@@ -14,12 +14,9 @@ namespace Project_theater
 {
     public partial class My_Account : MetroForm
     {
-       // User user;
-
         public My_Account()
         {
             InitializeComponent();
-           // user = us;
         }
 
         private void My_Account_Load(object sender, EventArgs e)
@@ -28,7 +25,6 @@ namespace Project_theater
             Fields_fill();
             panel5.Visible = false;
             personal_info_panel1.account = this;
-            personal_info_panel1.userid = Program.user.ID;
             my_account_firsttext_panel1.BringToFront();
         }
 

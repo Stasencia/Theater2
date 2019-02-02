@@ -20,7 +20,6 @@ C:\Users\Stasia\Desktop\Project_theater\bin\Debug\DB_Theater_log.ldf
 C:\Users\Stasia\Desktop\Project_theater\obj\Debug\Project_theater.My_Account.resources
 C:\Users\Stasia\Desktop\Project_theater\obj\Debug\Project_theater.Personal_info_panel.resources
 C:\Users\Stasia\Desktop\Project_theater\obj\Debug\Project_theater.Tickets_panel.resources
-C:\Users\Stasia\Desktop\Project_theater\obj\Debug\Project_theater.Change_info.resources
 C:\Users\Stasia\Desktop\uni_2018\Project_theater\Theater\Project_theater\bin\Debug\Project_theater.exe.config
 C:\Users\Stasia\Desktop\uni_2018\Project_theater\Theater\Project_theater\bin\Debug\Project_theater.exe
 C:\Users\Stasia\Desktop\uni_2018\Project_theater\Theater\Project_theater\bin\Debug\Project_theater.pdb

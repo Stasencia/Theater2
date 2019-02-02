@@ -15,15 +15,21 @@ namespace Project_theater
 {
     public partial class Personal_info_panel : UserControl
     {
-        public int userid;
+        string New_Login;
+        string Initial_Login;
+        string New_Password;
+        string Initial_Password;
         public My_Account account { get; set; }
+
         public Personal_info_panel()
         {
             InitializeComponent();
         }
 
-        private async void button1_Click(object sender, EventArgs e)
+        private void button1_Click(object sender, EventArgs e)
         {
+            Initial_Login = label3.Text;
+            New_Login = textBox1.Text;
             if (button1.Text == "Изменить")
             {
                 textBox1.Visible = true;
@@ -31,30 +37,18 @@ namespace Project_theater
             }
             else
             {
-                if (!string.IsNullOrWhiteSpace(textBox1.Text) && !string.IsNullOrEmpty(textBox1.Text))
-                {
-                    if(textBox1.Text != label3.Text)
-                    using (SqlConnection connection = new SqlConnection(DB_connection.connectionString))
-                    {
-                        await connection.OpenAsync();
-                        SqlCommand command = new SqlCommand("UPDATE Users SET Login=@Login WHERE Id = @ID", connection);
-                        command.Parameters.AddWithValue("@Login", textBox1.Text);
-                        command.Parameters.AddWithValue("@ID", userid);
-                        command.ExecuteNonQuery();
-                        MetroMessageBox.Show(this, "Изменения были успешно внесены", "", MessageBoxButtons.OK, MessageBoxIcon.Asterisk, 120);
-                        account.Fields_fill();
-                    }   
-                }
-                else
-                    MetroMessageBox.Show(this, "Неправильно введено значение логина", "", MessageBoxButtons.OK, MessageBoxIcon.Error, 120);
+                Program.user.Login_change(New_Login, Initial_Login, account);
                 textBox1.Visible = false;
                 button1.Text = "Изменить";
                 button1.Width = 86;
             }
+            
         }
 
-        private async void button2_Click(object sender, EventArgs e)
+        private void button2_Click(object sender, EventArgs e)
         {
+            Initial_Password = label4.Text;
+            New_Password = textBox2.Text;
             if (button2.Text == "Изменить")
             {
                 textBox2.Visible = true;
@@ -62,23 +56,7 @@ namespace Project_theater
             }
             else
             {
-                if (!string.IsNullOrWhiteSpace(textBox1.Text) && !string.IsNullOrEmpty(textBox1.Text))
-                {
-                    if (textBox2.Text != label4.Text)
-                    using (SqlConnection connection = new SqlConnection(DB_connection.connectionString))
-                    {
-                        await connection.OpenAsync();
-                        SqlCommand command = new SqlCommand("UPDATE Users SET Password=@Password WHERE Id = @ID", connection);
-                        command.Parameters.AddWithValue("@Password", textBox2.Text);
-                        command.Parameters.AddWithValue("@ID", userid);
-                        command.ExecuteNonQuery();
-                        MetroMessageBox.Show(this, "Изменения были успешно внесены", "", MessageBoxButtons.OK, MessageBoxIcon.Asterisk, 120);
-                        account.Fields_fill();
-                    }
-                    
-                }
-                else
-                    MetroMessageBox.Show(this, "Неправильно введено значение пароля", "", MessageBoxButtons.OK, MessageBoxIcon.Error, 120);
+                Program.user.Password_change(New_Password, Initial_Password, account);
                 textBox2.Visible = false;
                 button2.Text = "Изменить";
                 button2.Width = 86;

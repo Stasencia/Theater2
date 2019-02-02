@@ -81,5 +81,63 @@ namespace Project_theater
             else
                 MetroMessageBox.Show(sender, "Заполните все необходимые поля", "Ошибка заполнения", MessageBoxButtons.OK, MessageBoxIcon.Error, 120);
         }
+
+        public void Login_change(string new_login, string initial_login, My_Account account)
+        {
+            if (!string.IsNullOrWhiteSpace(new_login) && !string.IsNullOrEmpty(new_login))
+            {
+                if (new_login != initial_login)
+                {
+                    DataContext db = new DataContext(DB_connection.connectionString);
+                    var query = db.GetTable<TUsers>()
+                        .Any(k => k.Login == new_login);
+                    if (!query)
+                    {
+                        TUsers user = db.GetTable<TUsers>().Where(k => k.Id == Program.user.ID).First();
+                        user.Login = new_login;
+                        try
+                        {
+                            db.SubmitChanges();
+                        }
+                        catch (Exception e)
+                        {
+                            MetroMessageBox.Show(account, e.Message, "", MessageBoxButtons.OK, MessageBoxIcon.Error, 100);
+                        }
+                        MetroMessageBox.Show(account, "Изменения были успешно внесены", "", MessageBoxButtons.OK, MessageBoxIcon.Asterisk, 120);
+                    }
+                    else
+                        MetroMessageBox.Show(account, "Данный логин уже занят", "Значение логина", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, 120);
+                }
+            }
+            else
+                MetroMessageBox.Show(account, "Неправильно введено значение логина", "", MessageBoxButtons.OK, MessageBoxIcon.Error, 120);
+            account.Fields_fill();
+        }  
+        
+        public void Password_change(string new_password, string initial_password, My_Account account)
+        {
+            if (!string.IsNullOrWhiteSpace(new_password) && !string.IsNullOrEmpty(new_password))
+            {
+                if (new_password != initial_password)
+                {
+                    DataContext db = new DataContext(DB_connection.connectionString);
+                    TUsers user = db.GetTable<TUsers>().Where(k => k.Id == Program.user.ID).First();
+                    user.Password = new_password;
+                    try
+                    {
+                        db.SubmitChanges();
+                    }
+                    catch (Exception e)
+                    {
+                        MetroMessageBox.Show(account, e.Message, "", MessageBoxButtons.OK, MessageBoxIcon.Error, 100);
+                    }
+                    MetroMessageBox.Show(account, "Изменения были успешно внесены", "", MessageBoxButtons.OK, MessageBoxIcon.Asterisk, 120);
+                }
+            }
+            else
+                MetroMessageBox.Show(account, "Неправильно введено значение пароля", "", MessageBoxButtons.OK, MessageBoxIcon.Error, 120);
+            account.Fields_fill();
+        }
+
     }
 }
