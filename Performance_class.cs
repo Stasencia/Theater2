@@ -26,5 +26,22 @@ namespace Project_theater
             }
             return 0;
         }
+
+        public static int Update(int ID, TAfisha performance)
+        {
+            DataContext db = new DataContext(DB_connection.connectionString);
+            TAfisha perf = db.GetTable<TAfisha>().Where(k => k.Id == ID).First();
+            perf = performance;
+            try
+            {
+                db.SubmitChanges();
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
+                return 1;
+            }
+            return 0;
+        }
     }
 }

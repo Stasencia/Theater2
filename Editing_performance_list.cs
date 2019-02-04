@@ -102,7 +102,9 @@ namespace Project_theater
 
         public void Editing_Click(object sender, System.EventArgs e)
         {
-
+            Editing_performance form = new Editing_performance(this, Convert.ToInt32(((Button)sender).Tag));
+            form.Show();
+            this.Hide();
         }
 
         public void Deletion_Click(object sender, System.EventArgs e)
