@@ -155,6 +155,12 @@
     </Compile>
     <Compile Include="TAfisha.cs" />
     <Compile Include="TAfisha_dates.cs" />
+    <Compile Include="Testing_form.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Testing_form.Designer.cs">
+      <DependentUpon>Testing_form.cs</DependentUpon>
+    </Compile>
     <Compile Include="Ticket.cs" />
     <Compile Include="Tickets_panel.cs">
       <SubType>UserControl</SubType>
@@ -212,6 +218,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Registration.resx">
       <DependentUpon>Registration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Testing_form.resx">
+      <DependentUpon>Testing_form.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Tickets_panel.resx">
       <DependentUpon>Tickets_panel.cs</DependentUpon>

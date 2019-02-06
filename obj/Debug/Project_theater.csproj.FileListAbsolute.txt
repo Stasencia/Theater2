@@ -81,3 +81,4 @@ C:\Users\Stasia\Desktop\Project_theater2\obj\Debug\Project_theater.pdb
 C:\Users\Stasia\Desktop\Project_theater2\obj\Debug\Project_theater.csprojAssemblyReference.cache
 C:\Users\Stasia\Desktop\Project_theater\obj\Debug\Project_theater.Editing_performance_list.resources
 C:\Users\Stasia\Desktop\Project_theater\obj\Debug\Project_theater.Editing_performance.resources
+C:\Users\Stasia\Desktop\Project_theater\obj\Debug\Project_theater.Testing_form.resources

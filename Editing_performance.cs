@@ -1,10 +1,12 @@
-﻿using MetroFramework.Forms;
+﻿using MetroFramework;
+using MetroFramework.Forms;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Data.Linq;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,7 +16,7 @@ namespace Project_theater
 {
     public partial class Editing_performance : MetroForm
     {
-        TAfisha changed_performance = new TAfisha();
+        TAfisha changed_performance;
         Editing_performance_list editing_Performance_List;
         int performance_id;
         DataContext db = new DataContext(DB_connection.connectionString);
@@ -30,6 +32,7 @@ namespace Project_theater
         {
             panel_Images_Load();
             panel_Text_Load();
+            panel_Dates_Load();
             button1.PerformClick();
         }
 
@@ -56,6 +59,9 @@ namespace Project_theater
             p1 = new Panel();
             p2 = new Panel();
             p3 = new Panel();
+            p1.Name = "Medium";
+            p2.Name = "Small";
+            p3.Name = "Large";
             Label l1, l2, l3;
             l1 = new Label();
             l2 = new Label();
@@ -102,9 +108,15 @@ namespace Project_theater
 
         public void panel_Text_Load()
         {
-            panel_Text.Controls.Clear();
+            Panel panel_Text = new Panel();
+            panel_Text.Name = "panel_Text";
+            panel_Text.Location = new Point(-1, 124);
+            panel_Text.Size = new Size(800, 349);
+            panel_Text.AutoScroll = true;
+            this.Controls.Add(panel_Text);
 
             NumericUpDown numericUpDown = new NumericUpDown();
+            numericUpDown.Name = "Price";
             numericUpDown.Font = new Font("Century Gothic", 12, FontStyle.Regular);
             numericUpDown.Size = new Size(90, 27);
             numericUpDown.Maximum = 10000;
@@ -120,6 +132,12 @@ namespace Project_theater
                 tb[i].Font = new Font("Century Gothic", 10, FontStyle.Regular);
                 panel_Text.Controls.Add(tb[i]);
             }
+            tb[0].Name = "Name";
+            tb[1].Name = "Small_name";
+            tb[2].Name = "Small_info";
+            tb[3].Name = "Duration";
+            tb[4].Name = "Age_restriction";
+            tb[5].Name = "Description";
             tb[0].Font = new Font("Century Gothic", 12, FontStyle.Bold);
             tb[0].Size = new Size(357, 29);
             tb[1].Size = new Size(357, 23);
@@ -142,25 +160,15 @@ namespace Project_theater
             tb[3].Location = new Point(184, 206);
             tb[4].Location = new Point(184, 245);
             tb[5].Location = new Point(184, 283);
-           /* int lines, textwidth, textheight;
-            for (int i = 0; i<6;i++)
-            {
-                textheight = TextRenderer.MeasureText(tb[i].Text, tb[i].Font).Height;
-                textwidth = TextRenderer.MeasureText(tb[i].Text, tb[i].Font).Width;
-                lines = textwidth / tb[i].Width;
-                if (lines == 0 || textwidth % tb[i].Width != 0)
-                    lines++;
-                tb[i].Height = TextRenderer.MeasureText(tb[i].Text, tb[i].Font).Height * lines + 10;
-            }*/
-            
+
             Label[] l = new Label[7];
-            for(int i =0; i<7; i++)
+            for (int i = 0; i < 7; i++)
             {
                 l[i] = new Label();
                 l[i].AutoSize = true;
                 l[i].Font = new Font("Century Gothic", 12, FontStyle.Regular);
                 l[i].ForeColor = Color.DarkGray;
-                panel_Text.Controls.Add(l[i]);    
+                panel_Text.Controls.Add(l[i]);
             }
             l[0].Location = new Point(10, 11);
             l[1].Location = new Point(10, 52);
@@ -180,12 +188,83 @@ namespace Project_theater
 
         private void button2_Click(object sender, EventArgs e)
         {
-           panel_Text.BringToFront();
+            Controls["panel_Text"].BringToFront();
+        }
+
+        private void panel_Dates_Load()
+        {
+            /* Panel panel_Dates = new Panel();
+             panel_Dates.Name = "panel_Text";
+             panel_Dates.Location = new Point(-1, 124);
+             panel_Dates.Size = new Size(800, 349);
+             panel_Dates.AutoScroll = true;
+             this.Controls.Add(panel_Dates);*/
+            panel_Dates.Controls.Clear();
+            /*dateTimePicker1.CustomFormat = "MMMM yyyy";
+            dateTimePicker1.Format = DateTimePickerFormat.Custom;*/
+            var query = db.GetTable<TAfisha_dates>()
+                      .Where(l => l.Id_performance == performance_id && l.Date >= DateTime.Now)
+                      .Select(l => new { l.Date.Month, l.Date.Year })
+                      .Distinct();
+            if (query.Any())
+            {
+                int i = 0;
+                Months m;
+                foreach (var q in query)
+                {
+                    Button top = new Button();
+                    top.FlatStyle = FlatStyle.Flat;
+                    m = (Months)q.Month;
+                    top.Text = m + "\n" + q.Year;
+                    top.AutoSize = false;
+                    top.Size = new Size(82, 49);
+                    top.Font = new Font("Century Gothic", 10, FontStyle.Regular);
+                    top.Tag = q.Month + ";" + q.Year;
+                    top.BringToFront();
+                    top.Click += new System.EventHandler(this.Days_show);
+                    top.Name = "top" + (i + 1);
+                    top.TabStop = false;
+                    panel_Dates.Controls.Add(top);
+                    i++;
+                }
+
+                int k = (800 - (82 * i + (i - 1) * 22)) / 2;
+                for (int j = 0; j < i; j++)
+                {
+                    panel_Dates.Controls["top" + (j + 1)].Location = new Point(k + j * 82 + j * 22, 6);
+                }
+
+                for (int j = 0; j < 42; j++)
+                {
+                    Button b = new Button();
+                    b.Size = new Size(90, 90);
+                    b.Location = new Point(75 + (89 * (j % 7)), panel_Dates.Controls["top1"].Bottom + 15 + (89 * (int)Math.Floor(j / 7.0)));
+                    b.FlatStyle = FlatStyle.Flat;
+                    b.TextAlign = ContentAlignment.TopLeft;
+                    b.BackgroundImageLayout = ImageLayout.Stretch;
+                    b.Font = new Font("Century Gothic", 9, FontStyle.Regular);
+                    b.Name = "b" + (j + 1);
+                    b.Click += new System.EventHandler(this.Day_pushed);
+                    panel_Dates.Controls.Add(b);
+                }
+            }
+            else
+            {
+                Label l = new Label();
+                l.Text = "Для этого представления нет доступных дат";
+                l.Font = new Font("Century Gothic", 12, FontStyle.Regular);
+                l.AutoSize = true;
+                l.Location = new Point(222, 164);
+                l.ForeColor = Color.DarkGray;
+               
+                panel_Dates.Controls.Add(l);
+            }
         }
 
         private void button3_Click(object sender, EventArgs e)
         {
-            
+            //Controls["panel_Dates"].BringToFront();
+            panel_Dates.BringToFront();
         }
   
         private void panel_Click(object sender, EventArgs e)
@@ -210,10 +289,73 @@ namespace Project_theater
 
         private void button4_Click(object sender, EventArgs e)
         {
-            //changed_performance.Image = 
-
-          //  Performance_class.Update(performance_id, );
+            changed_performance = db.GetTable<TAfisha>().Where(k => k.Id == performance_id).First();
+            changed_performance.Name = Controls["panel_Text"].Controls["Name"].Text;
+            changed_performance.Price = Convert.ToDouble(((NumericUpDown)Controls["panel_Text"].Controls["Price"]).Value);
+            changed_performance.Small_name = Controls["panel_Text"].Controls["Small_name"].Text;
+            string[] Small_info = Controls["panel_Text"].Controls["Small_info"].Text.Split("\r\n".ToArray(), StringSplitOptions.None);
+            changed_performance.Small_info1 = Small_info[0];
+            changed_performance.Small_info2 = Small_info[1];
+            changed_performance.Small_info3 = Small_info[2];
+            changed_performance.Duration = Controls["panel_Text"].Controls["Duration"].Text;
+            changed_performance.Age_restriction = Controls["panel_Text"].Controls["Age_restriction"].Text;
+            changed_performance.Description = Controls["panel_Text"].Controls["Description"].Text;
+            try
+            {
+                db.SubmitChanges();
+            }
+            catch (Exception exc)
+            {
+                MetroMessageBox.Show(this, exc.Message);
+            }
+            /* string[] words = panel1.BackgroundImage.Tag.ToString().Split('\\');
+             string s = DB_connection.current_directory + "images_afisha\\" + words[words.ToList().Count - 1];
+             File.Delete();
+             File.Copy(panel1.BackgroundImage.Tag.ToString(), s);
+             */
         }
 
+        private void Days_show(object sender, EventArgs args)
+        {
+            string[] words = ((Control)sender).Tag.ToString().Split(';');
+            DateTime d = new DateTime(Convert.ToInt32(words[1]), Convert.ToInt32(words[0]), 1);
+            DateTime d1 = new DateTime(Convert.ToInt32(words[1]), Convert.ToInt32(words[0]), 1);
+            while (d.DayOfWeek != DayOfWeek.Monday)
+            {
+                d = d.AddDays(-1);
+            }
+            for (int i = 0; i < 42; i++)
+            {
+                Controls["b" + (i + 1)].Text = d.Day.ToString();
+                Controls["b" + (i + 1)].Enabled = false;
+                Controls["b" + (i + 1)].BackgroundImage = null;
+                Controls["b" + (i + 1)].Tag = d.Year + "-" + d.Month + "-" + d.Day;
+                d = d.AddDays(1);
+            }
+
+            var query = db.GetTable<TAfisha>()
+                        .Where(k => k.Id == performance_id)
+                        .Join(db.GetTable<TAfisha_dates>(),
+                              tp => tp.Id,
+                              ap => ap.Id_performance,
+                              (tp, ap) => new { tp.Small_image, ap.Date })
+                              .Where(k => k.Date >= d1 && k.Date >= DateTime.Now);
+            var buttons = Controls.OfType<Button>().Where(k => k.Name.StartsWith("b"))
+                            .Join(query,
+                                button => Convert.ToDateTime(button.Tag),
+                                afisha_info => afisha_info.Date,
+                                (button, afisha_info) => new { button, afisha_info });
+            foreach (var b in buttons)
+            {
+                string s = DB_connection.current_directory + "images_afisha\\" + b.afisha_info.Small_image;
+                b.button.Enabled = true;
+                b.button.BackgroundImage = new Bitmap(@s);
+            }
+        }
+
+        private void Day_pushed(object sender, EventArgs e)
+        {
+
+        }
     }
 }
