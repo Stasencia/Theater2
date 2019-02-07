@@ -30,6 +30,7 @@ namespace Project_theater
 
         private void Editing_performance_Load(object sender, EventArgs e)
         {
+            changed_performance = db.GetTable<TAfisha>().Where(k => k.Id == performance_id).First();
             panel_Images_Load();
             panel_Text_Load();
             panel_Dates_Load();
@@ -81,19 +82,17 @@ namespace Project_theater
             p1.Click += panel_Click;
             p2.Click += panel_Click;
             p3.Click += panel_Click;
-            var query = db.GetTable<TAfisha>().Where(k => k.Id == performance_id)
-                        .Select(k => new { k.Image, k.Big_image, k.Small_image }).First();
-            s = DB_connection.current_directory + "images_afisha\\" + query.Image;
+            s = DB_connection.current_directory + "images_afisha\\" + changed_performance.Image;
             p1.BackgroundImage = new Bitmap(@s);
             p1.BackgroundImageLayout = ImageLayout.Stretch;
             p1.Location = new Point(123, 42);
             p1.Size = new Size(210, 281);
-            s = DB_connection.current_directory + "images_afisha\\" + query.Small_image;
+            s = DB_connection.current_directory + "images_afisha\\" + changed_performance.Small_image;
             p2.BackgroundImage = new Bitmap(@s);
             p2.BackgroundImageLayout = ImageLayout.Stretch;
             p2.Size = new Size(140, 136);
             p2.Location = new Point(484, 105);
-            s = DB_connection.current_directory + "images_afisha\\" + query.Big_image;
+            s = DB_connection.current_directory + "images_afisha\\" + changed_performance.Big_image;
             p3.BackgroundImage = new Bitmap(@s);
             p3.BackgroundImageLayout = ImageLayout.Stretch;
             p3.Location = new Point(87, 382);
@@ -146,14 +145,13 @@ namespace Project_theater
             tb[4].Size = new Size(357, 25);
             tb[5].Size = new Size(576, 208);
 
-            var q = db.GetTable<TAfisha>().Where(k => k.Id == performance_id).First();
-            tb[0].Text = q.Name;
-            numericUpDown.Value = Convert.ToDecimal(q.Price);
-            tb[1].Text = q.Small_name;
-            tb[2].Text = q.Small_info;
-            tb[3].Text = q.Duration;
-            tb[4].Text = q.Age_restriction;
-            tb[5].Text = q.Description;
+            tb[0].Text = changed_performance.Name;
+            numericUpDown.Value = Convert.ToDecimal(changed_performance.Price);
+            tb[1].Text = changed_performance.Small_name;
+            tb[2].Text = changed_performance.Small_info;
+            tb[3].Text = changed_performance.Duration;
+            tb[4].Text = changed_performance.Age_restriction;
+            tb[5].Text = changed_performance.Description;
             tb[0].Location = new Point(184, 9);
             tb[1].Location = new Point(184, 95);
             tb[2].Location = new Point(184, 132);
@@ -202,6 +200,21 @@ namespace Project_theater
             panel_Dates.Controls.Clear();
             /*dateTimePicker1.CustomFormat = "MMMM yyyy";
             dateTimePicker1.Format = DateTimePickerFormat.Custom;*/
+            Button add_month = new Button();
+            add_month.Name = "Add_month";
+            add_month.FlatStyle = FlatStyle.Flat;
+            add_month.BackColor = Color.Teal;
+            add_month.ForeColor = Color.White;
+            add_month.Text = "Добавить месяц";
+            add_month.AutoSize = false;
+            add_month.Size = new Size(119, 49);
+            string s = DB_connection.current_directory + "icons\\plus.png";
+            add_month.Image = new Bitmap(@s);
+            add_month.ImageAlign = ContentAlignment.MiddleLeft;
+            add_month.TextImageRelation = TextImageRelation.ImageBeforeText;
+            add_month.Font = new Font("Century Gothic", 10, FontStyle.Regular);
+            add_month.Click += new System.EventHandler(this.Days_show);
+            panel_Dates.Controls.Add(add_month);
             var query = db.GetTable<TAfisha_dates>()
                       .Where(l => l.Id_performance == performance_id && l.Date >= DateTime.Now)
                       .Select(l => new { l.Date.Month, l.Date.Year })
@@ -233,12 +246,12 @@ namespace Project_theater
                 {
                     panel_Dates.Controls["top" + (j + 1)].Location = new Point(k + j * 82 + j * 22, 6);
                 }
-
+                add_month.Location = new Point(panel_Dates.Controls["top" + i].Right + 22, 6);
                 for (int j = 0; j < 42; j++)
                 {
                     Button b = new Button();
                     b.Size = new Size(90, 90);
-                    b.Location = new Point(75 + (89 * (j % 7)), panel_Dates.Controls["top1"].Bottom + 15 + (89 * (int)Math.Floor(j / 7.0)));
+                    b.Location = new Point(80 + (89 * (j % 7)), panel_Dates.Controls["top1"].Bottom + 15 + (89 * (int)Math.Floor(j / 7.0)));
                     b.FlatStyle = FlatStyle.Flat;
                     b.TextAlign = ContentAlignment.TopLeft;
                     b.BackgroundImageLayout = ImageLayout.Stretch;
@@ -247,6 +260,7 @@ namespace Project_theater
                     b.Click += new System.EventHandler(this.Day_pushed);
                     panel_Dates.Controls.Add(b);
                 }
+                ((Button)panel_Dates.Controls["top1"]).PerformClick();
             }
             else
             {
@@ -256,8 +270,9 @@ namespace Project_theater
                 l.AutoSize = true;
                 l.Location = new Point(222, 164);
                 l.ForeColor = Color.DarkGray;
-               
                 panel_Dates.Controls.Add(l);
+
+                add_month.Location = new Point((panel_Dates .Width - add_month.Width) / 2, 6);
             }
         }
 
@@ -289,7 +304,6 @@ namespace Project_theater
 
         private void button4_Click(object sender, EventArgs e)
         {
-            changed_performance = db.GetTable<TAfisha>().Where(k => k.Id == performance_id).First();
             changed_performance.Name = Controls["panel_Text"].Controls["Name"].Text;
             changed_performance.Price = Convert.ToDouble(((NumericUpDown)Controls["panel_Text"].Controls["Price"]).Value);
             changed_performance.Small_name = Controls["panel_Text"].Controls["Small_name"].Text;
@@ -323,10 +337,11 @@ namespace Project_theater
             }
             for (int i = 0; i < 42; i++)
             {
-                Controls["b" + (i + 1)].Text = d.Day.ToString();
-                Controls["b" + (i + 1)].Enabled = false;
-                Controls["b" + (i + 1)].BackgroundImage = null;
-                Controls["b" + (i + 1)].Tag = d.Year + "-" + d.Month + "-" + d.Day;
+                Controls["panel_Dates"].Controls["b" + (i + 1)].Text = d.Day.ToString();
+                if (!((Button)sender).Tag.ToString().StartsWith(d.Month.ToString()))
+                    Controls["panel_Dates"].Controls["b" + (i + 1)].Enabled = false;
+                Controls["panel_Dates"].Controls["b" + (i + 1)].BackgroundImage = null;
+                Controls["panel_Dates"].Controls["b" + (i + 1)].Tag = d.Year + "-" + d.Month + "-" + d.Day;
                 d = d.AddDays(1);
             }
 
@@ -337,7 +352,7 @@ namespace Project_theater
                               ap => ap.Id_performance,
                               (tp, ap) => new { tp.Small_image, ap.Date })
                               .Where(k => k.Date >= d1 && k.Date >= DateTime.Now);
-            var buttons = Controls.OfType<Button>().Where(k => k.Name.StartsWith("b"))
+            var buttons = Controls["panel_Dates"].Controls.OfType<Button>().Where(k => k.Name.StartsWith("b"))
                             .Join(query,
                                 button => Convert.ToDateTime(button.Tag),
                                 afisha_info => afisha_info.Date,
@@ -352,7 +367,17 @@ namespace Project_theater
 
         private void Day_pushed(object sender, EventArgs e)
         {
-
+            if (((Button)sender).BackgroundImage == null)
+            {
+                string s = DB_connection.current_directory + "images_afisha\\" + changed_performance.Small_image;
+                ((Button)sender).BackgroundImage = new Bitmap(@s);
+               // ((Button)sender).Controls["dateTimePicker"].Visible = true;
+            }
+            else
+            {
+                ((Button)sender).BackgroundImage = null;
+                //((Button)sender).Controls["dateTimePicker"].Visible = false;
+            }
         }
     }
 }
