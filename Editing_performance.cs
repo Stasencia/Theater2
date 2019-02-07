@@ -150,7 +150,7 @@ namespace Project_theater
             tb[0].Text = q.Name;
             numericUpDown.Value = Convert.ToDecimal(q.Price);
             tb[1].Text = q.Small_name;
-            tb[2].Text = q.Small_info1 + Environment.NewLine + q.Small_info2 + Environment.NewLine + q.Small_info3;
+            tb[2].Text = q.Small_info;
             tb[3].Text = q.Duration;
             tb[4].Text = q.Age_restriction;
             tb[5].Text = q.Description;
@@ -293,21 +293,18 @@ namespace Project_theater
             changed_performance.Name = Controls["panel_Text"].Controls["Name"].Text;
             changed_performance.Price = Convert.ToDouble(((NumericUpDown)Controls["panel_Text"].Controls["Price"]).Value);
             changed_performance.Small_name = Controls["panel_Text"].Controls["Small_name"].Text;
-            string[] Small_info = Controls["panel_Text"].Controls["Small_info"].Text.Split("\r\n".ToArray(), StringSplitOptions.None);
-            changed_performance.Small_info1 = Small_info[0];
-            changed_performance.Small_info2 = Small_info[1];
-            changed_performance.Small_info3 = Small_info[2];
+            changed_performance.Small_info = Controls["panel_Text"].Controls["Small_info"].Text;
             changed_performance.Duration = Controls["panel_Text"].Controls["Duration"].Text;
             changed_performance.Age_restriction = Controls["panel_Text"].Controls["Age_restriction"].Text;
             changed_performance.Description = Controls["panel_Text"].Controls["Description"].Text;
-            try
+        /*    try
             {
                 db.SubmitChanges();
             }
             catch (Exception exc)
             {
                 MetroMessageBox.Show(this, exc.Message);
-            }
+            }*/
             /* string[] words = panel1.BackgroundImage.Tag.ToString().Split('\\');
              string s = DB_connection.current_directory + "images_afisha\\" + words[words.ToList().Count - 1];
              File.Delete();

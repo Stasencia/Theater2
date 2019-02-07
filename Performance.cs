@@ -75,13 +75,13 @@ namespace Project_theater
 
             var query1 = db.GetTable<TAfisha>()
                             .Where(l => l.Id == perf_id)
-                            .Select(l => new { l.Big_image, l.Small_name, l.Small_info1, l.Small_info2, l.Small_info3, l.Duration, l.Age_restriction, l.Description});
+                            .Select(l => new { l.Big_image, l.Small_name, l.Small_info, l.Duration, l.Age_restriction, l.Description});
             foreach(var q in query1)
             {
                 s = DB_connection.current_directory + "images_afisha\\" + q.Big_image;
                 panel1.BackgroundImage = new Bitmap(@s);
                 label1.Text = q.Small_name;
-                label2.Text = q.Small_info1 + "\n" + q.Small_info2 + "\n" + q.Small_info3;
+                label2.Text = q.Small_info;
                 label7.Text = q.Duration;
                 label8.Text = q.Age_restriction;
                 label9.Text = q.Description;

@@ -24,11 +24,7 @@ namespace Project_theater
         [Column]
         public string Big_image { get; set; }
         [Column]
-        public string Small_info1 { get; set; }
-        [Column]
-        public string Small_info2 { get; set; }
-        [Column]
-        public string Small_info3 { get; set; }
+        public string Small_info { get; set; }
         [Column]
         public string Small_name { get; set; }
         [Column]
