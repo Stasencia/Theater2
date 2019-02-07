@@ -35,7 +35,7 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel6 = new System.Windows.Forms.Panel();
             this.button4 = new System.Windows.Forms.Button();
-            this.panel_Dates = new System.Windows.Forms.Panel();
+            this.panel2 = new System.Windows.Forms.Panel();
             this.label1 = new System.Windows.Forms.Label();
             this.dateTimePicker1 = new System.Windows.Forms.DateTimePicker();
             this.button8 = new System.Windows.Forms.Button();
@@ -44,7 +44,7 @@
             this.button5 = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.panel6.SuspendLayout();
-            this.panel_Dates.SuspendLayout();
+            this.panel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // button1
@@ -121,19 +121,19 @@
             this.button4.UseVisualStyleBackColor = false;
             this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
-            // panel_Dates
+            // panel2
             // 
-            this.panel_Dates.AutoScroll = true;
-            this.panel_Dates.Controls.Add(this.label1);
-            this.panel_Dates.Controls.Add(this.dateTimePicker1);
-            this.panel_Dates.Controls.Add(this.button8);
-            this.panel_Dates.Controls.Add(this.button7);
-            this.panel_Dates.Controls.Add(this.button6);
-            this.panel_Dates.Controls.Add(this.button5);
-            this.panel_Dates.Location = new System.Drawing.Point(-1, 124);
-            this.panel_Dates.Name = "panel_Dates";
-            this.panel_Dates.Size = new System.Drawing.Size(800, 349);
-            this.panel_Dates.TabIndex = 4;
+            this.panel2.AutoScroll = true;
+            this.panel2.Controls.Add(this.label1);
+            this.panel2.Controls.Add(this.dateTimePicker1);
+            this.panel2.Controls.Add(this.button8);
+            this.panel2.Controls.Add(this.button7);
+            this.panel2.Controls.Add(this.button6);
+            this.panel2.Controls.Add(this.button5);
+            this.panel2.Location = new System.Drawing.Point(-1, 124);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(800, 349);
+            this.panel2.TabIndex = 4;
             // 
             // label1
             // 
@@ -148,12 +148,15 @@
             // dateTimePicker1
             // 
             this.dateTimePicker1.CalendarFont = new System.Drawing.Font("Century Gothic", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.dateTimePicker1.CustomFormat = "MMMM yyyy";
             this.dateTimePicker1.Font = new System.Drawing.Font("Century Gothic", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.dateTimePicker1.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.dateTimePicker1.Location = new System.Drawing.Point(669, 58);
+            this.dateTimePicker1.Location = new System.Drawing.Point(535, 59);
+            this.dateTimePicker1.MinDate = new System.DateTime(2019, 2, 7, 17, 43, 58, 0);
             this.dateTimePicker1.Name = "dateTimePicker1";
-            this.dateTimePicker1.Size = new System.Drawing.Size(119, 23);
+            this.dateTimePicker1.Size = new System.Drawing.Size(123, 23);
             this.dateTimePicker1.TabIndex = 5;
+            this.dateTimePicker1.Value = new System.DateTime(2019, 2, 7, 17, 43, 58, 0);
             // 
             // button8
             // 
@@ -202,9 +205,9 @@
             this.button5.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
             this.button5.Image = ((System.Drawing.Image)(resources.GetObject("button5.Image")));
             this.button5.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.button5.Location = new System.Drawing.Point(669, 6);
+            this.button5.Location = new System.Drawing.Point(535, 6);
             this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(119, 49);
+            this.button5.Size = new System.Drawing.Size(123, 49);
             this.button5.TabIndex = 1;
             this.button5.Text = "Добавить месяц";
             this.button5.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
@@ -215,7 +218,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(797, 530);
-            this.Controls.Add(this.panel_Dates);
+            this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel6);
             this.Controls.Add(this.panel1);
             this.Name = "Editing_performance";
@@ -224,8 +227,8 @@
             this.Load += new System.EventHandler(this.Editing_performance_Load);
             this.panel1.ResumeLayout(false);
             this.panel6.ResumeLayout(false);
-            this.panel_Dates.ResumeLayout(false);
-            this.panel_Dates.PerformLayout();
+            this.panel2.ResumeLayout(false);
+            this.panel2.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -238,7 +241,7 @@
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Panel panel6;
         private System.Windows.Forms.Button button4;
-        private System.Windows.Forms.Panel panel_Dates;
+        private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Button button5;
         private System.Windows.Forms.Button button8;
         private System.Windows.Forms.Button button7;
