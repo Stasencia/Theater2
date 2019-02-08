@@ -24,9 +24,8 @@ namespace Project_theater
             get { return month_number; }
             set
             {
-                if (month_number == 3)
-                    On_month_number_overloaded();
                 month_number = value;
+                On_month_number_Changed();   
             }
         }
 
@@ -222,15 +221,29 @@ namespace Project_theater
             add_month.ImageAlign = ContentAlignment.MiddleLeft;
             add_month.TextImageRelation = TextImageRelation.ImageBeforeText;
             add_month.Font = new Font("Century Gothic", 10, FontStyle.Regular);
+            add_month.Location = new Point((panel_Dates.Width - add_month.Width) / 2, 6);
             add_month.Click += new System.EventHandler(Add_month_button_pushed);
             panel_Dates.Controls.Add(add_month);
+            DateTimePicker dateTimePicker = new DateTimePicker();
+            dateTimePicker.Name = "dateTimePicker";
+            dateTimePicker.Width = add_month.Width;
+            dateTimePicker.Location = new Point((panel_Dates.Width - dateTimePicker.Width) / 2, add_month.Bottom + 2);
+            dateTimePicker.Font = new Font("Century Gothic", 10, FontStyle.Regular);
+            dateTimePicker.CustomFormat = "MMMM yyyy";
+            dateTimePicker.Format = DateTimePickerFormat.Custom;
+            dateTimePicker.MinDate = DateTime.Now;
+            panel_Dates.Controls.Add(dateTimePicker);
+
+            ContextMenuStrip contextMenuStrip = new ContextMenuStrip();
+            ToolStripMenuItem deleteMenuItem = new ToolStripMenuItem("Удалить");
+            contextMenuStrip.Items.Add(deleteMenuItem);
+            deleteMenuItem.Click += DeleteMonth;
             var query = db.GetTable<TAfisha_dates>()
                       .Where(l => l.Id_performance == performance_id && l.Date >= DateTime.Now)
                       .Select(l => new { l.Date.Month, l.Date.Year })
                       .Distinct();
             if (query.Any())
             {
-                //int i = 0;
                 Months m;
                 foreach (var q in query)
                 {
@@ -238,6 +251,7 @@ namespace Project_theater
                     top.FlatStyle = FlatStyle.Flat;
                     m = (Months)q.Month;
                     top.Text = m + "\n" + q.Year;
+                    top.ContextMenuStrip = contextMenuStrip;
                     top.AutoSize = false;
                     top.Size = new Size(82, 49);
                     top.Font = new Font("Century Gothic", 10, FontStyle.Regular);
@@ -245,7 +259,6 @@ namespace Project_theater
                     top.BringToFront();
                     top.Click += new System.EventHandler(this.Days_show);
                     top.Name = "top" + (Month_number + 1);
-                    //top.TabStop = false;
                     panel_Dates.Controls.Add(top);
                     Month_number++;
                 }
@@ -256,19 +269,6 @@ namespace Project_theater
                     panel_Dates.Controls["top" + (j + 1)].Location = new Point(k + j * 82 + j * 6, 6);
                 }
                 add_month.Location = new Point(panel_Dates.Controls["top" + Month_number].Right + 6, 6);
-                for (int j = 0; j < 42; j++)
-                {
-                    Button b = new Button();
-                    b.Size = new Size(90, 90);
-                    b.Location = new Point(80 + (89 * (j % 7)), panel_Dates.Controls["top1"].Bottom + 30 + (89 * (int)Math.Floor(j / 7.0)));
-                    b.FlatStyle = FlatStyle.Flat;
-                    b.TextAlign = ContentAlignment.TopLeft;
-                    b.BackgroundImageLayout = ImageLayout.Stretch;
-                    b.Font = new Font("Century Gothic", 9, FontStyle.Regular);
-                    b.Name = "b" + (j + 1);
-                    b.Click += new System.EventHandler(this.Day_pushed);
-                    panel_Dates.Controls.Add(b);
-                }
                 ((Button)panel_Dates.Controls["top1"]).PerformClick();
             }
             else
@@ -281,18 +281,7 @@ namespace Project_theater
                 l.Location = new Point(222, 164);
                 l.ForeColor = Color.DarkGray;
                 panel_Dates.Controls.Add(l);
-
-                add_month.Location = new Point((panel_Dates.Width - add_month.Width) / 2, 6);
             }
-            DateTimePicker dateTimePicker = new DateTimePicker();
-            dateTimePicker.Name = "dateTimePicker";
-            dateTimePicker.Location = new Point(add_month.Location.X, add_month.Bottom + 2);
-            dateTimePicker.Font = new Font("Century Gothic", 10, FontStyle.Regular);
-            dateTimePicker.Width = add_month.Width;
-            dateTimePicker.CustomFormat = "MMMM yyyy";
-            dateTimePicker.Format = DateTimePickerFormat.Custom;
-            dateTimePicker.MinDate = DateTime.Now;
-            panel_Dates.Controls.Add(dateTimePicker);
         }
 
         private void button3_Click(object sender, EventArgs e)
@@ -346,71 +335,6 @@ namespace Project_theater
 
         private void Days_show(object sender, EventArgs args)
         {
-            string[] words = ((Control)sender).Tag.ToString().Split(';');
-            DateTime d = new DateTime(Convert.ToInt32(words[1]), Convert.ToInt32(words[0]), 1);
-            DateTime d1 = new DateTime(Convert.ToInt32(words[1]), Convert.ToInt32(words[0]), 1);
-            while (d.DayOfWeek != DayOfWeek.Monday)
-            {
-                d = d.AddDays(-1);
-            }
-            for (int i = 0; i < 42; i++)
-            {
-                Controls["panel_Dates"].Controls["b" + (i + 1)].Text = d.Day.ToString();
-                Controls["panel_Dates"].Controls["b" + (i + 1)].Enabled = true;
-                if (!((Button)sender).Tag.ToString().StartsWith(d.Month.ToString()))
-                    Controls["panel_Dates"].Controls["b" + (i + 1)].Enabled = false;
-                Controls["panel_Dates"].Controls["b" + (i + 1)].BackgroundImage = null;
-                Controls["panel_Dates"].Controls["b" + (i + 1)].Tag = d.Year + "-" + d.Month + "-" + d.Day;
-                d = d.AddDays(1);
-            }
-
-            var query = db.GetTable<TAfisha>()
-                        .Where(k => k.Id == performance_id)
-                        .Join(db.GetTable<TAfisha_dates>(),
-                              tp => tp.Id,
-                              ap => ap.Id_performance,
-                              (tp, ap) => new { tp.Small_image, ap.Date })
-                              .Where(k => k.Date >= d1 && k.Date >= DateTime.Now);
-            var buttons = Controls["panel_Dates"].Controls.OfType<Button>().Where(k => k.Name.StartsWith("b"))
-                            .Join(query,
-                                button => Convert.ToDateTime(button.Tag),
-                                afisha_info => afisha_info.Date,
-                                (button, afisha_info) => new { button, afisha_info });
-            foreach (var b in buttons)
-            {
-                string s = DB_connection.current_directory + "images_afisha\\" + b.afisha_info.Small_image;
-                b.button.BackgroundImage = new Bitmap(@s);
-            }
-        }
-
-        private void Add_month_button_pushed(object sender, EventArgs e)
-        {
-            if (Controls["panel_Dates"].Controls.ContainsKey("Label_no_dates"))
-                Controls["panel_Dates"].Controls.RemoveByKey("Label_no_dates");
-            Month_number++;
-            int month = ((DateTimePicker)Controls["panel_Dates"].Controls["dateTimePicker"]).Value.Month;
-            int year = ((DateTimePicker)Controls["panel_Dates"].Controls["dateTimePicker"]).Value.Year;
-            Months m =  (Months)month;
-            Button top = new Button();
-            top.FlatStyle = FlatStyle.Flat;
-            top.Text = m + "\n" + year;
-            top.AutoSize = false;
-            top.Size = new Size(82, 49);
-            top.Font = new Font("Century Gothic", 10, FontStyle.Regular);
-            top.Tag = month + ";" + year;
-            top.BringToFront();
-            top.Click += new System.EventHandler(this.Days_show);
-            top.Name = "top" + (Month_number);
-            //top.TabStop = false;
-            Controls["panel_Dates"].Controls.Add(top);
-
-            int k = (800 - (82 * Month_number + (Month_number - 1) * 22)) / 2;
-            for (int j = 0; j < Month_number; j++)
-            {
-                Controls["panel_Dates"].Controls["top" + (j + 1)].Location = new Point(k + j * 82 + j * 6, 6);
-            }
-            Controls["panel_Dates"].Controls["Add_month"].Location = new Point(Controls["panel_Dates"].Controls["top" + Month_number].Right + 6, 6);
-
             for (int j = 0; j < 42; j++)
             {
                 Button b = new Button();
@@ -422,8 +346,93 @@ namespace Project_theater
                 b.Font = new Font("Century Gothic", 9, FontStyle.Regular);
                 b.Name = "b" + (j + 1);
                 b.Click += new System.EventHandler(this.Day_pushed);
+               
+
+                DateTimePicker dateTimePicker = new DateTimePicker();
+                dateTimePicker.Name = "time" + (j + 1);
+                dateTimePicker.Format = DateTimePickerFormat.Custom;
+                dateTimePicker.CustomFormat = "HH:mm";
+                dateTimePicker.ShowUpDown = true;
+                dateTimePicker.Font = new Font("Century Gothic", 10, FontStyle.Regular);
+                dateTimePicker.Size = new Size(62, 23);
+                dateTimePicker.Name = "dateTimePicker";
+                dateTimePicker.Visible = false;
+                dateTimePicker.Dock = DockStyle.Bottom;
+                b.Controls.Add(dateTimePicker);
+
                 Controls["panel_Dates"].Controls.Add(b);
             }
+            string[] words = ((Control)sender).Tag.ToString().Split(';');
+            DateTime d = new DateTime(Convert.ToInt32(words[1]), Convert.ToInt32(words[0]), 1);
+            DateTime d1 = new DateTime(Convert.ToInt32(words[1]), Convert.ToInt32(words[0]), 1);
+            while (d.DayOfWeek != DayOfWeek.Monday)
+            {
+                d = d.AddDays(-1);
+            }
+
+            var query = db.GetTable<TAfisha>()
+                        .Where(k => k.Id == performance_id)
+                        .Join(db.GetTable<TAfisha_dates>(),
+                              tp => tp.Id,
+                              ap => ap.Id_performance,
+                              (tp, ap) => new { tp.Small_image, ap.Date })
+                              .Where(k => k.Date >= d1 && k.Date >= DateTime.Now);
+            var buttons = Controls["panel_Dates"].Controls.OfType<Button>().Where(k => k.Name.StartsWith("b"))
+                            .Join(query,
+                                button => Convert.ToDateTime(button.Tag).ToShortDateString(),
+                                afisha_info => afisha_info.Date.ToShortDateString(),
+                                (button, afisha_info) => new { button, afisha_info });
+            foreach (var b in buttons)
+            {
+                string s = DB_connection.current_directory + "images_afisha\\" + b.afisha_info.Small_image;
+                b.button.BackgroundImage = new Bitmap(@s);
+                b.button.Controls.OfType<DateTimePicker>().First().Visible = true;
+              //  b.button.Controls.OfType<DateTimePicker>().First().Value = ;
+            }
+
+            for (int i = 0; i < 42; i++)
+            {
+                Controls["panel_Dates"].Controls["b" + (i + 1)].Text = d.Day.ToString();
+                Controls["panel_Dates"].Controls["b" + (i + 1)].Enabled = true;
+                if (!((Button)sender).Tag.ToString().StartsWith(d.Month.ToString()))
+                    Controls["panel_Dates"].Controls["b" + (i + 1)].Enabled = false;
+                Controls["panel_Dates"].Controls["b" + (i + 1)].BackgroundImage = null;
+                Controls["panel_Dates"].Controls["b" + (i + 1)].Tag = d.Year + "-" + d.Month + "-" + d.Day;
+                d = d.AddDays(1);
+            }
+        }
+
+        private void Add_month_button_pushed(object sender, EventArgs e)
+        {
+            if (Controls["panel_Dates"].Controls.ContainsKey("Label_no_dates"))
+                Controls["panel_Dates"].Controls.RemoveByKey("Label_no_dates");
+            Month_number++;
+            int month = ((DateTimePicker)Controls["panel_Dates"].Controls["dateTimePicker"]).Value.Month;
+            int year = ((DateTimePicker)Controls["panel_Dates"].Controls["dateTimePicker"]).Value.Year;
+            ContextMenuStrip contextMenuStrip = new ContextMenuStrip();
+            ToolStripMenuItem deleteMenuItem = new ToolStripMenuItem("Удалить");
+            contextMenuStrip.Items.Add(deleteMenuItem);
+            deleteMenuItem.Click += DeleteMonth;
+            Months m =  (Months)month;
+            Button top = new Button();
+            top.FlatStyle = FlatStyle.Flat;
+            top.Text = m + "\n" + year;
+            top.AutoSize = false;
+            top.Size = new Size(82, 49);
+            top.Font = new Font("Century Gothic", 10, FontStyle.Regular);
+            top.Tag = month + ";" + year;
+            top.ContextMenuStrip = contextMenuStrip;
+            top.BringToFront();
+            top.Click += new System.EventHandler(this.Days_show);
+            top.Name = "top" + (Month_number);
+            Controls["panel_Dates"].Controls.Add(top);
+            
+            int k = (800 - (82 * Month_number + (Month_number - 1) * 22)) / 2;
+            for (int j = 0; j < Month_number; j++)
+            {
+                Controls["panel_Dates"].Controls["top" + (j + 1)].Location = new Point(k + j * 82 + j * 6, 6);
+            }
+            Controls["panel_Dates"].Controls["Add_month"].Location = new Point(Controls["panel_Dates"].Controls["top" + Month_number].Right + 6, 6);
         }
 
         private void Day_pushed(object sender, EventArgs e)
@@ -441,13 +450,42 @@ namespace Project_theater
             }
         }
 
-        private void On_month_number_overloaded()
+        private void On_month_number_Changed()
         {
-            Controls["panel_Dates"].Controls["Add_month"].Enabled = false;
-            Controls["panel_Dates"].Controls["dateTimePicker"].Visible = false;
-            ToolTip toolTip1 = new ToolTip();
-            
-            //toolTip1.SetToolTip(Controls["panel_Dates"].Controls["Add_month"], "Добавлено максимально возможное количество месяцев");
+            if(Month_number >= 4)
+            {
+                Controls["panel_Dates"].Controls["Add_month"].Enabled = false;
+                Controls["panel_Dates"].Controls["dateTimePicker"].Visible = false;
+            }
+            else
+            {
+                Controls["panel_Dates"].Controls["Add_month"].Enabled = true;
+                Controls["panel_Dates"].Controls["dateTimePicker"].Visible = true;
+            }
+        }
+
+        private void DeleteMonth(object sender, EventArgs e)
+        {
+            Control remove = ((ContextMenuStrip)((ToolStripMenuItem)sender).Owner).SourceControl;
+            Controls["panel_Dates"].Controls.RemoveByKey(remove.Name);
+            Month_number--;
+            IEnumerable<Button> tops = Controls["panel_Dates"].Controls.OfType<Button>().Where(k => k.Name.StartsWith("top"));
+            if(tops.Any())
+            {
+                int i = 0;
+                int k = (800 - (82 * Month_number + (Month_number - 1) * 22)) / 2;
+                foreach (Button t in tops)
+                {
+                    t.Name = "top" + (i + 1);
+                    t.Location = new Point(k + i * 82 + i * 6, 6);
+                    i++;
+                }
+                Controls["panel_Dates"].Controls["Add_month"].Location = new Point(Controls["panel_Dates"].Controls["top" + Month_number].Right + 6, 6);
+            }
+            else
+            {
+                Controls["panel_Dates"].Controls["Add_month"].Location = new Point((Controls["panel_Dates"].Width - Controls["panel_Dates"].Controls["Add_month"].Width) / 2, 6);
+            }
         }
     }
 }

@@ -55,14 +55,15 @@ namespace Project_theater
                               .Where(k => k.Date >=d1 && k.Date >= DateTime.Now);
             var buttons = Controls.OfType<Button>().Where(k => k.Name.StartsWith("b"))
                             .Join(query,
-                                button => Convert.ToDateTime(button.Tag),
-                                afisha_info => afisha_info.Date,
+                                button => Convert.ToDateTime(button.Tag).ToShortDateString(),
+                                afisha_info => afisha_info.Date.ToShortDateString(),
                                 (button, afisha_info) => new { button, afisha_info });
             foreach(var b in buttons)
             {
                 string s = DB_connection.current_directory + "images_afisha\\" + b.afisha_info.Small_image;
                 b.button.Enabled = true;
                 b.button.BackgroundImage = new Bitmap(@s);
+                b.button.Tag = b.afisha_info.Date;
             }
         }
 
@@ -149,7 +150,7 @@ namespace Project_theater
             p.Height = 90;
             p.Width = 90;
             p.Location = new Point(p.Location.X + 10, p.Location.Y + 10);
-            p.Text = ((Button)sender).Tag.ToString().Split('-')[2];
+            p.Text = ((DateTime)((Button)sender).Tag).Day.ToString();
             p.Font = new Font("Century Gothic", 9, FontStyle.Regular);
             p.ForeColor = Color.Black;
             p.TextAlign = ContentAlignment.TopLeft;
@@ -164,8 +165,8 @@ namespace Project_theater
             DateTime date = Convert.ToDateTime(((Button)sender).Tag);
             var query = db.GetTable<TAfisha_dates>()
                         .Where(l => l.Id_performance == perf_id && l.Date == date)
-                        .Select(l => new { l.Time, l.Id}).First();
-            p.Text = query.Time;
+                        .Select(l => new { l.Date, l.Id}).First();
+            p.Text = query.Date.ToShortTimeString();
             p.Font = new Font("Century Gothic", 11, FontStyle.Bold);
             p.ForeColor = Color.White;
             p.TextAlign = ContentAlignment.BottomLeft;
@@ -175,7 +176,7 @@ namespace Project_theater
 
         private void Performance_Activated(object sender, EventArgs e)
         {
-            panel1.Size = new Size(780, 380);
+           // panel1.Size = new Size(780, 380);
         }
 
         private void Performance_Shown(object sender, EventArgs e)

@@ -63,9 +63,9 @@ namespace Project_theater
                         .Join(db.GetTable<TAfisha>(),
                             a => a.Id_performance,
                             b => b.Id,
-                            (a, b) => new { a.Date, a.Time, b.Duration, b.Image, b.Id, b.Price }).First();
+                            (a, b) => new { a.Date, b.Duration, b.Image, b.Id, b.Price }).First();
             label5.Text = "Дата: " + query1.Date.ToShortDateString();
-            label1.Text = "Начало: " + query1.Time;
+            label1.Text = "Начало: " + query1.Date.ToShortTimeString();
             label2.Text = query1.Duration;
             string s = DB_connection.current_directory + "images_afisha\\" + query1.Image;
             panel1.BackgroundImage = new Bitmap(@s);

@@ -22,15 +22,15 @@ namespace Project_theater
                     .Join(db.GetTable<TAfisha_dates>(),
                         tp => tp.Performance_info_id,
                         ap => ap.Id,
-                        (tp, ap) => new { Id = ap.Id_performance, ap.Date, ap.Time, tp.Seat, tp.User_Id })
+                        (tp, ap) => new { Id = ap.Id_performance, ap.Date, tp.Seat, tp.User_Id })
                     .Join(db.GetTable<TAfisha>(),
                       tp => tp.Id,
                       ap => ap.Id,
-                      (tp, ap) => new { ap.Name, tp.Date, tp.Time, tp.Seat, ap.Small_image, tp.User_Id, ap.Is_relevant })
+                      (tp, ap) => new { ap.Name, tp.Date, tp.Seat, ap.Small_image, tp.User_Id, ap.Is_relevant })
                   .Where(k => k.User_Id == Program.user.ID)
-                  .GroupBy(x => new { x.Name, x.Date, x.Time, x.Small_image, x.Is_relevant })
+                  .GroupBy(x => new { x.Name, x.Date, x.Small_image, x.Is_relevant })
                   .OrderByDescending(x => x.Key.Date)
-                  .Select(x => new Ticket_sell_info { Name = x.Key.Name, Date = x.Key.Date, Time = x.Key.Time, Small_image = x.Key.Small_image, Is_relevant = x.Key.Is_relevant, Count = x.Select(d => d.Seat).Count(), Seats = x.Select(d => d.Seat) });
+                  .Select(x => new Ticket_sell_info { Name = x.Key.Name, Date = x.Key.Date, Small_image = x.Key.Small_image, Is_relevant = x.Key.Is_relevant, Count = x.Select(d => d.Seat).Count(), Seats = x.Select(d => d.Seat) });
 
             return ticket_Sell_Infos;
         }
@@ -80,7 +80,7 @@ namespace Project_theater
                 }         
 
                 l2.Location = new Point(215, 101 + i * 140);
-                st = "Дата: " + Convert.ToDateTime(q.Date).ToShortDateString() + "    Время: " + q.Time;
+                st = "Дата: " + Convert.ToDateTime(q.Date).ToShortDateString() + "    Время: " + q.Date.ToShortTimeString();
                 l2.Text = st;
                 l2.Font = new Font("Century Gothic", 11, FontStyle.Regular);
                 l2.AutoSize = true;
