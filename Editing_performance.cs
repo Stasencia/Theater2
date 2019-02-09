@@ -407,10 +407,13 @@ namespace Project_theater
 
         private void DeleteMonth(object sender, EventArgs e)
         {
-            Control remove = ((ContextMenuStrip)((ToolStripMenuItem)sender).Owner).SourceControl;
-            Controls["panel_Dates"].Controls.RemoveByKey(remove.Name);
+            Control button = ((ContextMenuStrip)((ToolStripMenuItem)sender).Owner).SourceControl;
+            Control panel = Controls["panel_Dates"].Controls.OfType<Panel>().Where(k => k.Tag == button).First();
+            Controls["panel_Dates"].Controls.RemoveByKey(button.Name);
+            Controls["panel_Dates"].Controls.RemoveByKey(panel.Name);
             Month_number--;
             IEnumerable<Button> tops = Controls["panel_Dates"].Controls.OfType<Button>().Where(k => k.Name.StartsWith("top"));
+            IEnumerable<Panel> panels = Controls["panel_Dates"].Controls.OfType<Panel>().Where(k => k.Name.StartsWith("panel_on_panel_Dates"));
             if(tops.Any())
             {
                 int i = 0;
@@ -421,16 +424,19 @@ namespace Project_theater
                     t.Location = new Point(k + i * 82 + i * 6, 6);
                     i++;
                 }
+                i = 0;
+                foreach(Panel p in panels)
+                {
+                    p.Name = "panel_on_panel_Dates" + (i + 1);
+                    i++;
+                }
                 Controls["panel_Dates"].Controls["Add_month"].Location = new Point(Controls["panel_Dates"].Controls["top" + Month_number].Right + 6, 6);
                 ((Button)Controls["panel_Dates"].Controls["top1"]).PerformClick();
+                ((Button)Controls["panel_Dates"].Controls["top1"]).Focus();
             }
             else
             {
                 Controls["panel_Dates"].Controls["Add_month"].Location = new Point((Controls["panel_Dates"].Width - Controls["panel_Dates"].Controls["Add_month"].Width) / 2, 6);
-                for(int i = 0; i<42; i++)
-                {
-                    Controls["panel_Dates"].Controls["b" + (i + 1)].Visible = false;
-                }
             }
         }
 
@@ -449,7 +455,7 @@ namespace Project_theater
             top.FlatStyle = FlatStyle.Flat;
             top.Text = m + "\n" + year;
             top.AutoSize = false;
-            top.Size = new Size(82, 49);
+            top.Size = new Size(85, 49);
             top.Font = new Font("Century Gothic", 10, FontStyle.Regular);
             top.Tag = month + ";" + year;
             top.ContextMenuStrip = contextMenuStrip;
@@ -494,15 +500,16 @@ namespace Project_theater
             //
             Controls["panel_Dates"].Controls.Add(p);
             //
-            int k = (800 - (82 * Month_number + (Month_number - 1) * 22)) / 2;
+            int k = (800 - (85 * Month_number + (Month_number - 1) * 22)) / 2;
             for (int j = 0; j < Month_number; j++)
             {
-                Controls["panel_Dates"].Controls["top" + (j + 1)].Location = new Point(k + j * 82 + j * 6, 6);
+                Controls["panel_Dates"].Controls["top" + (j + 1)].Location = new Point(k + j * 85 + j * 6, 6);
             }
             Controls["panel_Dates"].Controls["Add_month"].Location = new Point(Controls["panel_Dates"].Controls["top" + Month_number].Right + 6, 6);
             //Make days for the month
             Customize_days(p.Name);
-            p.BringToFront();
+            top.PerformClick();
+            top.Focus();
         }
     }
 }
