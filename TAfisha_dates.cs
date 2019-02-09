@@ -15,5 +15,7 @@ namespace Project_theater
         public int Id_performance { get; set; }
         [Column]
         public DateTime Date { get; set; }
+        [Column]
+        public bool Cancelled { get; set; }
     }
 }

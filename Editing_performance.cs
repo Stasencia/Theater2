@@ -94,16 +94,19 @@ namespace Project_theater
             p3.Click += panel_Click;
             s = DB_connection.current_directory + "images_afisha\\" + changed_performance.Image;
             p1.BackgroundImage = new Bitmap(@s);
+            p1.BackgroundImage.Tag = s;
             p1.BackgroundImageLayout = ImageLayout.Stretch;
             p1.Location = new Point(123, 42);
             p1.Size = new Size(210, 281);
             s = DB_connection.current_directory + "images_afisha\\" + changed_performance.Small_image;
             p2.BackgroundImage = new Bitmap(@s);
+            p2.BackgroundImage.Tag = s;
             p2.BackgroundImageLayout = ImageLayout.Stretch;
             p2.Size = new Size(140, 136);
             p2.Location = new Point(484, 105);
             s = DB_connection.current_directory + "images_afisha\\" + changed_performance.Big_image;
             p3.BackgroundImage = new Bitmap(@s);
+            p3.BackgroundImage.Tag = s;
             p3.BackgroundImageLayout = ImageLayout.Stretch;
             p3.Location = new Point(87, 382);
             p3.Size = new Size(636, 281);
@@ -290,30 +293,6 @@ namespace Project_theater
                     "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
-        }
-
-        private void button4_Click(object sender, EventArgs e)
-        {
-            changed_performance.Name = Controls["panel_Text"].Controls["Name"].Text;
-            changed_performance.Price = Convert.ToDouble(((NumericUpDown)Controls["panel_Text"].Controls["Price"]).Value);
-            changed_performance.Small_name = Controls["panel_Text"].Controls["Small_name"].Text;
-            changed_performance.Small_info = Controls["panel_Text"].Controls["Small_info"].Text;
-            changed_performance.Duration = Controls["panel_Text"].Controls["Duration"].Text;
-            changed_performance.Age_restriction = Controls["panel_Text"].Controls["Age_restriction"].Text;
-            changed_performance.Description = Controls["panel_Text"].Controls["Description"].Text;
-        /*    try
-            {
-                db.SubmitChanges();
-            }
-            catch (Exception exc)
-            {
-                MetroMessageBox.Show(this, exc.Message);
-            }*/
-            /* string[] words = panel1.BackgroundImage.Tag.ToString().Split('\\');
-             string s = DB_connection.current_directory + "images_afisha\\" + words[words.ToList().Count - 1];
-             File.Delete();
-             File.Copy(panel1.BackgroundImage.Tag.ToString(), s);
-             */
         }
 
         private void OnMonthButtonPushed(object sender, EventArgs args)
@@ -516,5 +495,43 @@ namespace Project_theater
                 top.Focus();
             }
         }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            changed_performance.Name = Controls["panel_Text"].Controls["Name"].Text;
+            changed_performance.Price = Convert.ToDouble(((NumericUpDown)Controls["panel_Text"].Controls["Price"]).Value);
+            changed_performance.Small_name = Controls["panel_Text"].Controls["Small_name"].Text;
+            changed_performance.Small_info = Controls["panel_Text"].Controls["Small_info"].Text;
+            changed_performance.Duration = Controls["panel_Text"].Controls["Duration"].Text;
+            changed_performance.Age_restriction = Controls["panel_Text"].Controls["Age_restriction"].Text;
+            changed_performance.Description = Controls["panel_Text"].Controls["Description"].Text;
+            string[] words = Controls["panel_Images"].Controls["Small"].BackgroundImage.Tag.ToString().Split('\\');
+            string s = DB_connection.current_directory + "images_afisha\\" + words[words.ToList().Count - 1];
+            if (!File.Exists(s))
+                File.Copy(Controls["panel_Images"].Controls["Small"].BackgroundImage.Tag.ToString(), s);
+            changed_performance.Small_image = words[words.ToList().Count - 1];
+            words = Controls["panel_Images"].Controls["Medium"].BackgroundImage.Tag.ToString().Split('\\');
+            s = DB_connection.current_directory + "images_afisha\\" + words[words.ToList().Count - 1];
+            if (!File.Exists(s))
+                File.Copy(Controls["panel_Images"].Controls["Medium"].BackgroundImage.Tag.ToString(), s);
+            changed_performance.Image = words[words.ToList().Count - 1];
+            words = Controls["panel_Images"].Controls["Large"].BackgroundImage.Tag.ToString().Split('\\');
+            s = DB_connection.current_directory + "images_afisha\\" + words[words.ToList().Count - 1];
+            if (!File.Exists(s))
+                File.Copy(Controls["panel_Images"].Controls["Large"].BackgroundImage.Tag.ToString(), s);
+            changed_performance.Big_image = words[words.ToList().Count - 1];
+
+            try
+            {
+                db.SubmitChanges();
+            }
+            catch (Exception exc)
+            {
+                MetroMessageBox.Show(this, exc.Message);
+            }
+            MetroMessageBox.Show(this, "Изменения были успешно применены", "", MessageBoxButtons.OK, MessageBoxIcon.Asterisk, 120);
+
+        }
+
     }
 }
