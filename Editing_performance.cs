@@ -251,6 +251,7 @@ namespace Project_theater
                 }
                 add_month.Location = new Point(panel_Dates.Controls["top" + Month_number].Right + 6, 6);
                 ((Button)panel_Dates.Controls["top1"]).PerformClick();
+                ((Button)panel_Dates.Controls["top1"]).Focus();
             }
             else
             {
@@ -442,74 +443,78 @@ namespace Project_theater
 
         private void AddMonth(int month, int year)
         {
-            Month_number++;
-            //Контекстное меню
-            ContextMenuStrip contextMenuStrip = new ContextMenuStrip();
-            ToolStripMenuItem deleteMenuItem = new ToolStripMenuItem("Удалить");
-            contextMenuStrip.Items.Add(deleteMenuItem);
-            deleteMenuItem.Click += DeleteMonth;
-            //
-            //Кнопка месяца
-            Months m = (Months)month;
-            Button top = new Button();
-            top.FlatStyle = FlatStyle.Flat;
-            top.Text = m + "\n" + year;
-            top.AutoSize = false;
-            top.Size = new Size(85, 49);
-            top.Font = new Font("Century Gothic", 10, FontStyle.Regular);
-            top.Tag = month + ";" + year;
-            top.ContextMenuStrip = contextMenuStrip;
-            top.BringToFront();
-            top.Click += new System.EventHandler(this.OnMonthButtonPushed);
-            top.Name = "top" + Month_number;
-            Controls["panel_Dates"].Controls.Add(top);
-            //
-            //Панель кнопки месяца
-            Panel p = new Panel();
-            p.Size = new Size(800, 264);
-            p.Location = new Point(-1, 85);
-            p.AutoScroll = true;
-            p.Tag = top;
-            p.Name = "panel_on_panel_Dates" + Month_number; 
-            //Кнопки дней и время для них
-            for (int j = 0; j < 42; j++)
+            bool query = Controls["panel_Dates"].Controls.OfType<Button>().Where(l => (l.Tag == null ? string.Empty : l.Tag.ToString()) == (month + ";" + year)).Any();
+            if (!query)
             {
-                Button b = new Button();
-                b.Size = new Size(90, 90);
-                b.Location = new Point(80 + (89 * (j % 7)), (89 * (int)Math.Floor(j / 7.0)));
-                b.FlatStyle = FlatStyle.Flat;
-                b.TextAlign = ContentAlignment.TopLeft;
-                b.BackgroundImageLayout = ImageLayout.Stretch;
-                b.Font = new Font("Century Gothic", 9, FontStyle.Regular);
-                b.Name = "b" + (j + 1);
-                b.Visible = true;
-                b.Click += new System.EventHandler(this.Day_pushed);
+                Month_number++;
+                //Контекстное меню
+                ContextMenuStrip contextMenuStrip = new ContextMenuStrip();
+                ToolStripMenuItem deleteMenuItem = new ToolStripMenuItem("Удалить");
+                contextMenuStrip.Items.Add(deleteMenuItem);
+                deleteMenuItem.Click += DeleteMonth;
+                //
+                //Кнопка месяца
+                Months m = (Months)month;
+                Button top = new Button();
+                top.FlatStyle = FlatStyle.Flat;
+                top.Text = m + "\n" + year;
+                top.AutoSize = false;
+                top.Size = new Size(85, 49);
+                top.Font = new Font("Century Gothic", 10, FontStyle.Regular);
+                top.Tag = month + ";" + year;
+                top.ContextMenuStrip = contextMenuStrip;
+                top.BringToFront();
+                top.Click += new System.EventHandler(this.OnMonthButtonPushed);
+                top.Name = "top" + Month_number;
+                Controls["panel_Dates"].Controls.Add(top);
+                //
+                //Панель кнопки месяца
+                Panel p = new Panel();
+                p.Size = new Size(800, 264);
+                p.Location = new Point(-1, 85);
+                p.AutoScroll = true;
+                p.Tag = top;
+                p.Name = "panel_on_panel_Dates" + Month_number;
+                //Кнопки дней и время для них
+                for (int j = 0; j < 42; j++)
+                {
+                    Button b = new Button();
+                    b.Size = new Size(90, 90);
+                    b.Location = new Point(80 + (89 * (j % 7)), (89 * (int)Math.Floor(j / 7.0)));
+                    b.FlatStyle = FlatStyle.Flat;
+                    b.TextAlign = ContentAlignment.TopLeft;
+                    b.BackgroundImageLayout = ImageLayout.Stretch;
+                    b.Font = new Font("Century Gothic", 9, FontStyle.Regular);
+                    b.Name = "b" + (j + 1);
+                    b.Visible = true;
+                    b.Click += new System.EventHandler(this.Day_pushed);
 
-                DateTimePicker TimePicker = new DateTimePicker();
-                TimePicker.Name = "TimePicker";
-                TimePicker.Format = DateTimePickerFormat.Custom;
-                TimePicker.CustomFormat = "HH:mm";
-                TimePicker.ShowUpDown = true;
-                TimePicker.Font = new Font("Century Gothic", 10, FontStyle.Regular);
-                TimePicker.Size = new Size(62, 23);
-                TimePicker.Visible = false;
-                TimePicker.Dock = DockStyle.Bottom;
-                b.Controls.Add(TimePicker);
-                p.Controls.Add(b);
+                    DateTimePicker TimePicker = new DateTimePicker();
+                    TimePicker.Name = "TimePicker";
+                    TimePicker.Format = DateTimePickerFormat.Custom;
+                    TimePicker.CustomFormat = "HH:mm";
+                    TimePicker.ShowUpDown = true;
+                    TimePicker.Font = new Font("Century Gothic", 10, FontStyle.Regular);
+                    TimePicker.Size = new Size(62, 23);
+                    TimePicker.Visible = false;
+                    TimePicker.Dock = DockStyle.Bottom;
+                    b.Controls.Add(TimePicker);
+                    p.Controls.Add(b);
+                }
+                //
+                Controls["panel_Dates"].Controls.Add(p);
+                //
+                int k = (800 - (85 * Month_number + (Month_number - 1) * 22)) / 2;
+                for (int j = 0; j < Month_number; j++)
+                {
+                    Controls["panel_Dates"].Controls["top" + (j + 1)].Location = new Point(k + j * 85 + j * 6, 6);
+                }
+                Controls["panel_Dates"].Controls["Add_month"].Location = new Point(Controls["panel_Dates"].Controls["top" + Month_number].Right + 6, 6);
+                //Make days for the month
+                Customize_days(p.Name);
+                top.PerformClick();
+                top.Focus();
             }
-            //
-            Controls["panel_Dates"].Controls.Add(p);
-            //
-            int k = (800 - (85 * Month_number + (Month_number - 1) * 22)) / 2;
-            for (int j = 0; j < Month_number; j++)
-            {
-                Controls["panel_Dates"].Controls["top" + (j + 1)].Location = new Point(k + j * 85 + j * 6, 6);
-            }
-            Controls["panel_Dates"].Controls["Add_month"].Location = new Point(Controls["panel_Dates"].Controls["top" + Month_number].Right + 6, 6);
-            //Make days for the month
-            Customize_days(p.Name);
-            top.PerformClick();
-            top.Focus();
         }
     }
 }
