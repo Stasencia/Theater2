@@ -305,9 +305,8 @@ namespace Project_theater
         private void Customize_days(string panel_name)
         {
             Panel p = (Panel)Controls["panel_Dates"].Controls[panel_name];
-            string[] words = ((Button)p.Tag).Tag.ToString().Split(';');
-            DateTime d = new DateTime(Convert.ToInt32(words[1]), Convert.ToInt32(words[0]), 1);
-            DateTime d1 = new DateTime(Convert.ToInt32(words[1]), Convert.ToInt32(words[0]), 1);
+            DateTime d = Convert.ToDateTime(((Button)p.Tag).Tag);
+            DateTime d1 = Convert.ToDateTime(((Button)p.Tag).Tag);
             while (d.DayOfWeek != DayOfWeek.Monday)
             {
                 d = d.AddDays(-1);
@@ -316,7 +315,7 @@ namespace Project_theater
             {
                 p.Controls["b" + (i + 1)].Text = d.Day.ToString();
                 p.Controls["b" + (i + 1)].Enabled = true;
-                if (!((Button)p.Tag).Tag.ToString().StartsWith(d.Month.ToString()))
+                if (((DateTime)((Button)p.Tag).Tag).Month != d.Month)
                     p.Controls["b" + (i + 1)].Enabled = false;
                 p.Controls["b" + (i + 1)].BackgroundImage = null;
                 p.Controls["b" + (i + 1)].Visible = true;
@@ -422,7 +421,8 @@ namespace Project_theater
 
         private void AddMonth(int month, int year)
         {
-            bool query = Controls["panel_Dates"].Controls.OfType<Button>().Where(l => (l.Tag == null ? string.Empty : l.Tag.ToString()) == (month + ";" + year)).Any();
+            DateTime d = new DateTime(year, month, 1);
+            bool query = Controls["panel_Dates"].Controls.OfType<Button>().Where(l => (Convert.ToDateTime(l.Tag) == d)).Any();
             if (!query)
             {
                 Month_number++;
@@ -440,7 +440,7 @@ namespace Project_theater
                 top.AutoSize = false;
                 top.Size = new Size(85, 49);
                 top.Font = new Font("Century Gothic", 10, FontStyle.Regular);
-                top.Tag = month + ";" + year;
+                top.Tag = d;
                 top.ContextMenuStrip = contextMenuStrip;
                 top.BringToFront();
                 top.Click += new System.EventHandler(this.OnMonthButtonPushed);
@@ -521,6 +521,28 @@ namespace Project_theater
                 File.Copy(Controls["panel_Images"].Controls["Large"].BackgroundImage.Tag.ToString(), s);
             changed_performance.Big_image = words[words.ToList().Count - 1];
 
+            List<TAfisha_dates> new_afisha_dates = new List<TAfisha_dates>();
+            List<TAfisha_dates> cancelled_afisha_dates = new List<TAfisha_dates>();
+            var query1 = Controls["panel_Dates"].Controls.OfType<Panel>().Where(k => k.Name.StartsWith("panel_on_panel_Dates"));
+            foreach(Panel p in query1)
+            {
+                var query2 = db.GetTable<TAfisha_dates>()
+                            .Where(k => k.Id_performance == performance_id && k.Date.Month == Convert.ToDateTime(((Button)p.Tag).Tag).Month);
+                var dates = p.Controls.OfType<Button>()
+                            .Where(k => k.Name.StartsWith("b") && k.BackgroundImage != null)
+                            .Select(k => k.Controls.OfType<DateTimePicker>().Where(l => l.Name.StartsWith("TimePicker")).First().Value);
+                var new_dates = dates.Where(k => !query2.Select(l => l.Date).Contains(k));
+                foreach(DateTime d in new_dates)
+                {
+                    new_afisha_dates.Add(new TAfisha_dates() { Id_performance = performance_id, Date = d});
+                }
+                var cancelled_dates = query2.Where(k => !dates.Contains(k.Date));
+                foreach(TAfisha_dates d in cancelled_dates)
+                {
+                    d.Cancelled = true;
+                }
+            }
+            db.GetTable<TAfisha_dates>().InsertAllOnSubmit(new_afisha_dates);
             try
             {
                 db.SubmitChanges();
