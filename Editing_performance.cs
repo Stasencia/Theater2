@@ -241,7 +241,7 @@ namespace Project_theater
             //
             //Запрос на нахождение всех доступных месяцев для текущего представления
             var query = db.GetTable<TAfisha_dates>()
-                      .Where(l => l.Id_performance == performance_id && l.Date >= DateTime.Now)
+                      .Where(l => l.Id_performance == performance_id && l.Date >= DateTime.Now && !l.Cancelled)
                       .Select(l => new { l.Date.Month, l.Date.Year })
                       .Distinct();
             //
@@ -315,7 +315,7 @@ namespace Project_theater
             {
                 p.Controls["b" + (i + 1)].Text = d.Day.ToString();
                 p.Controls["b" + (i + 1)].Enabled = true;
-                if (((DateTime)((Button)p.Tag).Tag).Month != d.Month)
+                if (((DateTime)((Button)p.Tag).Tag).Month != d.Month || d.AddDays(1) < DateTime.Now)
                     p.Controls["b" + (i + 1)].Enabled = false;
                 p.Controls["b" + (i + 1)].BackgroundImage = null;
                 p.Controls["b" + (i + 1)].Visible = true;
@@ -329,8 +329,8 @@ namespace Project_theater
                         .Join(db.GetTable<TAfisha_dates>(),
                               tp => tp.Id,
                               ap => ap.Id_performance,
-                              (tp, ap) => new { tp.Small_image, ap.Date })
-                              .Where(k => k.Date >= d1 && k.Date >= DateTime.Now);
+                              (tp, ap) => new { tp.Small_image, ap.Date, ap.Cancelled })
+                              .Where(k => k.Date >= d1 && k.Date >= DateTime.Now && !k.Cancelled);
             var buttons = p.Controls.OfType<Button>().Where(k => k.Name.StartsWith("b"))
                             .Join(query,
                                 button => Convert.ToDateTime(button.Tag).ToShortDateString(),
@@ -491,6 +491,7 @@ namespace Project_theater
                 Controls["panel_Dates"].Controls["Add_month"].Location = new Point(Controls["panel_Dates"].Controls["top" + Month_number].Right + 6, 6);
                 //Make days for the month
                 Customize_days(p.Name);
+                //
                 top.PerformClick();
                 top.Focus();
             }
@@ -527,14 +528,21 @@ namespace Project_theater
             foreach(Panel p in query1)
             {
                 var query2 = db.GetTable<TAfisha_dates>()
-                            .Where(k => k.Id_performance == performance_id && k.Date.Month == Convert.ToDateTime(((Button)p.Tag).Tag).Month);
+                            .Where(k => k.Id_performance == performance_id && k.Date.Month == Convert.ToDateTime(((Button)p.Tag).Tag).Month && !k.Cancelled);
+                var query3 = db.GetTable<TAfisha_dates>()
+                            .Where(k => k.Id_performance == performance_id && k.Date.Month == Convert.ToDateTime(((Button)p.Tag).Tag).Month && k.Cancelled);
                 var dates = p.Controls.OfType<Button>()
                             .Where(k => k.Name.StartsWith("b") && k.BackgroundImage != null)
                             .Select(k => k.Controls.OfType<DateTimePicker>().Where(l => l.Name.StartsWith("TimePicker")).First().Value);
-                var new_dates = dates.Where(k => !query2.Select(l => l.Date).Contains(k));
+                var new_dates = dates.Where(k => !query2.Select(l => l.Date).Contains(k) && !query3.Select(l => l.Date).Contains(k));
+                var uncancelled_dates = query3.Where(k => dates.Contains(k.Date));
                 foreach(DateTime d in new_dates)
                 {
                     new_afisha_dates.Add(new TAfisha_dates() { Id_performance = performance_id, Date = d});
+                }
+                foreach(TAfisha_dates d in uncancelled_dates)
+                {
+                    d.Cancelled = false;
                 }
                 var cancelled_dates = query2.Where(k => !dates.Contains(k.Date));
                 foreach(TAfisha_dates d in cancelled_dates)
