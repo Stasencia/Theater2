@@ -13,8 +13,13 @@ namespace Project_theater
         public static int Delete(int ID)
         {
             DataContext db = new DataContext(DB_connection.connectionString);
-            TAfisha perf = db.GetTable<TAfisha>().Where(k => k.Id == ID).First();
-            perf.Is_relevant = false;
+            IQueryable<TAfisha_dates> dates = db.GetTable<TAfisha_dates>().Where(k => k.Id_performance == ID && k.Date > DateTime.Now);
+            foreach(TAfisha_dates d in dates)
+            {
+                d.Cancelled = true;
+            }
+            TAfisha performance = db.GetTable<TAfisha>().Where(k => k.Id == ID).First();
+            performance.Is_relevant = false;
             try
             {
                 db.SubmitChanges();

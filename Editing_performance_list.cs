@@ -32,7 +32,7 @@ namespace Project_theater
         {
             panel1.Controls.Clear();
             int i = 0;
-            var query = db.GetTable<TAfisha>().Where(k => k.Is_relevant == true);
+            var query = db.GetTable<TAfisha>().Where(k => k.Is_relevant);
             foreach (var q in query)
             {
                 panel1.Height += 360;

@@ -53,7 +53,6 @@ namespace Project_theater
                         .Select(k => k.Id_performance)
                         .Distinct().ToArray();
             var query1 = db.GetTable<TAfisha>()
-                        .Where(k => k.Is_relevant == true)
                         .Where(k => query2.Contains(k.Id))
                         .Select(k => new { k.Image, k.Name, k.Duration, k.Age_restriction, k.Description, k.Id});
 

@@ -22,15 +22,15 @@ namespace Project_theater
                     .Join(db.GetTable<TAfisha_dates>(),
                         tp => tp.Performance_info_id,
                         ap => ap.Id,
-                        (tp, ap) => new { Id = ap.Id_performance, ap.Date, tp.Seat, tp.User_Id })
+                        (tp, ap) => new { Id = ap.Id_performance, ap.Date, tp.Seat, tp.User_Id, ap.Cancelled })
                     .Join(db.GetTable<TAfisha>(),
                       tp => tp.Id,
                       ap => ap.Id,
-                      (tp, ap) => new { ap.Name, tp.Date, tp.Seat, ap.Small_image, tp.User_Id, ap.Is_relevant })
+                      (tp, ap) => new { ap.Name, tp.Date, tp.Seat, ap.Small_image, tp.User_Id, tp.Cancelled })
                   .Where(k => k.User_Id == Program.user.ID)
-                  .GroupBy(x => new { x.Name, x.Date, x.Small_image, x.Is_relevant })
+                  .GroupBy(x => new { x.Name, x.Date, x.Small_image, x.Cancelled })
                   .OrderByDescending(x => x.Key.Date)
-                  .Select(x => new Ticket_sell_info { Name = x.Key.Name, Date = x.Key.Date, Small_image = x.Key.Small_image, Is_relevant = x.Key.Is_relevant, Count = x.Select(d => d.Seat).Count(), Seats = x.Select(d => d.Seat) });
+                  .Select(x => new Ticket_sell_info { Name = x.Key.Name, Date = x.Key.Date, Small_image = x.Key.Small_image, Cancelled = x.Key.Cancelled, Count = x.Select(d => d.Seat).Count(), Seats = x.Select(d => d.Seat)});
 
             return ticket_Sell_Infos;
         }
@@ -69,7 +69,7 @@ namespace Project_theater
                 l1.AutoSize = true;
                 l1.Font = new Font("Century Gothic", 11, FontStyle.Regular);
                 panel.Controls.Add(l1);
-                if (q.Date >= DateTime.Now && q.Is_relevant == false)
+                if (q.Date >= DateTime.Now && q.Cancelled == true)
                 {
                     Label cancelled = new Label();
                     cancelled.Location = new Point(l1.Left + l1.Width + 15, 74 + i * 140);

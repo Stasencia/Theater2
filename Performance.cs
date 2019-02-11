@@ -51,8 +51,8 @@ namespace Project_theater
                         .Join(db.GetTable<TAfisha_dates>(),
                               tp => tp.Id,
                               ap => ap.Id_performance,
-                              (tp, ap) => new { tp.Small_image, ap.Date })
-                              .Where(k => k.Date >=d1 && k.Date >= DateTime.Now);
+                              (tp, ap) => new { tp.Small_image, ap.Date, ap.Cancelled })
+                              .Where(k => k.Date >=d1 && k.Date >= DateTime.Now && !k.Cancelled);
             var buttons = Controls.OfType<Button>().Where(k => k.Name.StartsWith("b"))
                             .Join(query,
                                 button => Convert.ToDateTime(button.Tag).ToShortDateString(),
